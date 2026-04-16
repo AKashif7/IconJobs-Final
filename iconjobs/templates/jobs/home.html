@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% block title %}IconJobs — Local Micro Jobs in London{% endblock %}
+{% block content %}
+
+<section class="hero">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-7">
+        <p class="section-label mb-2">London's Micro Job Platform</p>
+        <h1 class="hero-title">Find local work,<br><span>fast.</span></h1>
+        <p class="hero-sub">Short shifts, day jobs, and quick gigs from real London businesses. Apply today, start tomorrow.</p>
+        <form method="GET" action="/jobs/" class="search-bar">
+          <input type="text" name="q" class="form-control flex-grow-1" placeholder="Job title, keyword...">
+          <input type="text" name="location" class="form-control" style="max-width:160px" placeholder="Location">
+          <button class="btn btn-amber" type="submit"><i class="bi bi-search me-1"></i>Search</button>
+        </form>
+        <p class="mt-3" style="color:rgba(255,255,255,0.45);font-size:0.85rem">{{ total_jobs }} open jobs right now</p>
+      </div>
+      <div class="col-lg-5 d-none d-lg-flex justify-content-end">
+        <div style="background:rgba(232,160,32,0.12);border:1px solid rgba(232,160,32,0.25);border-radius:16px;padding:2rem;display:inline-block;text-align:center">
+          <div style="font-family:'Syne',sans-serif;color:var(--amber);font-size:3rem;font-weight:800">{{ total_jobs }}+</div>
+          <div style="color:rgba(255,255,255,0.6);font-size:0.9rem">Open Micro Jobs</div>
+          <hr style="border-color:rgba(255,255,255,0.1);margin:1rem 0">
+          <div style="display:flex;gap:1.5rem;justify-content:center">
+            <div style="text-align:center"><div style="color:white;font-weight:700">2h–1mo</div><div style="color:rgba(255,255,255,0.5);font-size:0.8rem">Durations</div></div>
+            <div style="text-align:center"><div style="color:white;font-weight:700">Local</div><div style="color:rgba(255,255,255,0.5);font-size:0.8rem">In-Person</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% if categories %}
+<section style="background:var(--paper);padding:1.2rem 0;border-bottom:1px solid var(--border)">
+  <div class="container">
+    <div class="d-flex gap-2 flex-wrap">
+      <a href="/jobs/" class="tag tag-grey"><i class="bi bi-grid me-1"></i>All</a>
+      {% for cat in categories %}
+      <a href="/jobs/?category={{ cat.id }}" class="tag">{{ cat.name }}</a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<div class="container py-5">
+  {% if trending_jobs %}
+  <div class="mb-5">
+    <div class="d-flex justify-content-between align-items-end mb-3">
+      <div>
+        <p class="section-label mb-1"><i class="bi bi-fire me-1"></i>Trending Now</p>
+        <h2 class="section-title">Hot Jobs This Week</h2>
+      </div>
+      <a href="/jobs/" style="font-size:0.875rem;color:var(--amber-dark);font-weight:600;text-decoration:none">View all <i class="bi bi-arrow-right"></i></a>
+    </div>
+    <div class="row g-3">
+      {% for job in trending_jobs %}
+      <div class="col-md-6 col-lg-4">
+        <div class="job-card h-100">
+          {% if job.is_trending %}<span class="trending-badge"><i class="bi bi-fire me-1"></i>Trending</span>{% endif %}
+          <a href="/jobs/{{ job.pk }}/" class="job-card-title d-block mb-1">{{ job.title }}</a>
+          <p class="job-company mb-2">{{ job.employer.profile.company_name|default:job.employer.get_full_name }}</p>
+          <div class="job-meta d-flex gap-3 mb-2 flex-wrap">
+            <span><i class="bi bi-geo-alt"></i> {{ job.location }}</span>
+            <span><i class="bi bi-clock"></i> {{ job.get_duration_display }}</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mt-3">
+            <span class="tag">£{{ job.pay_rate }}/{{ job.pay_type }}</span>
+            <span style="font-size:0.8rem;color:var(--slate-light)"><i class="bi bi-people me-1"></i>{{ job.applicant_count }} applied</span>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <div>
+    <div class="d-flex justify-content-between align-items-end mb-3">
+      <div>
+        <p class="section-label mb-1"><i class="bi bi-clock-history me-1"></i>Just Posted</p>
+        <h2 class="section-title">Recent Opportunities</h2>
+      </div>
+      <a href="/jobs/" style="font-size:0.875rem;color:var(--amber-dark);font-weight:600;text-decoration:none">Browse all <i class="bi bi-arrow-right"></i></a>
+    </div>
+    <div class="row g-3">
+      {% for job in recent_jobs %}
+      <div class="col-md-6 col-lg-4">
+        <div class="job-card h-100">
+          <a href="/jobs/{{ job.pk }}/" class="job-card-title d-block mb-1">{{ job.title }}</a>
+          <p class="job-company mb-2">{{ job.employer.profile.company_name|default:job.employer.get_full_name }}</p>
+          <div class="job-meta d-flex gap-3 mb-2 flex-wrap">
+            <span><i class="bi bi-geo-alt"></i> {{ job.location }}</span>
+            <span><i class="bi bi-clock"></i> {{ job.get_duration_display }}</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mt-3">
+            <span class="tag">£{{ job.pay_rate }}/{{ job.pay_type }}</span>
+            {% if job.category %}<span class="tag tag-blue">{{ job.category.name }}</span>{% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  {% if not user.is_authenticated %}
+  <div class="text-center mt-5 py-4" style="background:var(--amber-light);border-radius:var(--radius);border:1px solid rgba(232,160,32,0.3)">
+    <h3 style="font-family:'Syne',sans-serif;font-weight:800">Ready to find your next gig?</h3>
+    <p style="color:var(--slate);margin:0.5rem 0 1.5rem">Create your free account and apply in minutes.</p>
+    <a href="/accounts/register/" class="btn btn-amber btn-lg me-2">Join as Job Seeker</a>
+    <a href="/accounts/register/" class="btn btn-outline-ink btn-lg">Post a Job</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

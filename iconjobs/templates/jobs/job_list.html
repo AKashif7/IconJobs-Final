@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block title %}Browse Jobs — IconJobs{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="container">
+    <p class="section-label mb-1">All Opportunities</p>
+    <h1>Browse Jobs</h1>
+  </div>
+</div>
+
+<div class="container py-4">
+  <form method="GET" class="card mb-4" style="padding:1.25rem">
+    <div class="row g-2 align-items-end">
+      <div class="col-md-4">
+        <label class="form-label">Keyword</label>
+        {{ form.q }}
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Location</label>
+        {{ form.location }}
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Duration</label>
+        {{ form.duration }}
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Category</label>
+        {{ form.category }}
+      </div>
+      <div class="col-md-1 d-grid">
+        <button type="submit" class="btn btn-amber"><i class="bi bi-search"></i></button>
+      </div>
+    </div>
+  </form>
+
+  {% if jobs %}
+  <p style="font-size:0.875rem;color:var(--slate-light);margin-bottom:1rem">{{ jobs.count }} job{{ jobs.count|pluralize }} found</p>
+  <div class="row g-3">
+    {% for job in jobs %}
+    <div class="col-md-6 col-lg-4">
+      <div class="job-card h-100">
+        {% if job.is_trending %}<span class="trending-badge"><i class="bi bi-fire me-1"></i>Trending</span>{% endif %}
+        <a href="/jobs/{{ job.pk }}/" class="job-card-title d-block mb-1">{{ job.title }}</a>
+        <p class="job-company mb-2">{{ job.employer.profile.company_name|default:job.employer.get_full_name }}</p>
+        <div class="job-meta d-flex gap-3 mb-2 flex-wrap">
+          <span><i class="bi bi-geo-alt"></i> {{ job.location }}</span>
+          <span><i class="bi bi-clock"></i> {{ job.get_duration_display }}</span>
+          <span><i class="bi bi-calendar3"></i> {{ job.start_date }}</span>
+        </div>
+        <p style="font-size:0.85rem;color:var(--slate);margin-bottom:1rem">{{ job.description|truncatechars:90 }}</p>
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="tag">£{{ job.pay_rate }}/{{ job.pay_type }}</span>
+          <div class="d-flex gap-2 align-items-center">
+            {% if job.category %}<span class="tag tag-blue" style="font-size:0.7rem">{{ job.category.name }}</span>{% endif %}
+            <span style="font-size:0.8rem;color:var(--slate-light)"><i class="bi bi-people me-1"></i>{{ job.applicant_count }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-center py-5">
+    <i class="bi bi-search" style="font-size:3rem;color:var(--border)"></i>
+    <h4 class="mt-3" style="font-family:'Syne',sans-serif">No jobs found</h4>
+    <p style="color:var(--slate-light)">Try adjusting your search filters</p>
+    <a href="/jobs/" class="btn btn-outline-ink mt-2">Clear Filters</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
