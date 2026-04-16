@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block title %}Edit Profile — IconJobs{% endblock %}
+{% block content %}
+<div class="container py-4" style="max-width:640px">
+  <a href="/accounts/profile/" style="font-size:0.875rem;color:var(--amber-dark);font-weight:600;text-decoration:none"><i class="bi bi-arrow-left me-1"></i>Back to Profile</a>
+  <div class="card mt-3 p-4">
+    <h2 style="font-family:'Syne',sans-serif;font-weight:800;margin-bottom:1.5rem">Edit Your Profile</h2>
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">First Name</label>
+          {{ form.first_name }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Last Name</label>
+          {{ form.last_name }}
+        </div>
+        <div class="col-12">
+          <label class="form-label">Email</label>
+          {{ form.email }}
+        </div>
+        <div class="col-12">
+          <label class="form-label">Bio</label>
+          {{ form.bio }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Location</label>
+          {{ form.location }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Phone</label>
+          {{ form.phone }}
+        </div>
+        <div class="col-12">
+          <label class="form-label">Profile Picture</label>
+          {{ form.profile_picture }}
+        </div>
+
+        {% if profile.role == 'jobseeker' %}
+        <div class="col-12">
+          <label class="form-label">CV (PDF)</label>
+          {{ form.cv }}
+          {% if profile.cv %}<small class="text-muted">Current: <a href="{{ profile.cv.url }}">{{ profile.cv.name }}</a></small>{% endif %}
+        </div>
+        <div class="col-12">
+          <label class="form-label">Skills (comma separated)</label>
+          {{ form.skills }}
+        </div>
+        <div class="col-12">
+          <label class="form-label">Availability</label>
+          {{ form.availability }}
+        </div>
+        {% elif profile.role == 'employer' %}
+        <div class="col-12">
+          <label class="form-label">Company Name</label>
+          {{ form.company_name }}
+        </div>
+        <div class="col-12">
+          <label class="form-label">Company Description</label>
+          {{ form.company_description }}
+        </div>
+        <div class="col-12">
+          <label class="form-label">Website</label>
+          {{ form.website }}
+        </div>
+        {% endif %}
+
+        <div class="col-12">
+          <div style="background:var(--paper);border-radius:var(--radius-sm);padding:1rem">
+            <strong style="font-size:0.875rem">Privacy Settings</strong>
+            <p style="font-size:0.8rem;color:var(--slate-light);margin:0.25rem 0 0.75rem">Contact details are only revealed to employers who accept you.</p>
+            <div class="form-check">
+              {{ form.reveal_phone }}
+              <label class="form-check-label" for="{{ form.reveal_phone.id_for_label }}" style="font-size:0.875rem">Allow accepted employers to see my phone number</label>
+            </div>
+            <div class="form-check mt-1">
+              {{ form.reveal_email }}
+              <label class="form-check-label" for="{{ form.reveal_email.id_for_label }}" style="font-size:0.875rem">Allow accepted employers to see my email</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex gap-2 mt-4">
+        <button type="submit" class="btn btn-amber btn-lg flex-grow-1"><i class="bi bi-check-lg me-1"></i>Save Changes</button>
+        <a href="/accounts/profile/" class="btn btn-outline-ink btn-lg">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
