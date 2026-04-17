@@ -1,0 +1,380 @@
+{% extends 'base.html' %}
+
+{% block title %}Career Guide — IconJobs{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+
+    <!-- Hero -->
+    <div class="text-center mb-5">
+        <h1 class="display-5 fw-bold mb-2">Career Guide</h1>
+        <p class="text-muted fs-5" style="max-width:560px;margin:0 auto">
+            Everything you need to find your next role — or hire your next great person.
+        </p>
+    </div>
+
+    <!-- Tab switcher -->
+    <ul class="nav nav-pills justify-content-center mb-5 gap-2" id="guideTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active px-4 py-2" id="seeker-tab" data-bs-toggle="pill"
+                    data-bs-target="#seeker" type="button" role="tab">
+                <i class="bi bi-person-check me-2"></i>Job Seekers
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link px-4 py-2" id="employer-tab" data-bs-toggle="pill"
+                    data-bs-target="#employer" type="button" role="tab">
+                <i class="bi bi-briefcase me-2"></i>Employers
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="guideTabsContent">
+
+        <!-- ===== JOB SEEKER TAB ===== -->
+        <div class="tab-pane fade show active" id="seeker" role="tabpanel">
+
+            <!-- Step cards -->
+            <h4 class="fw-semibold mb-4" style="color:var(--amber)">How to Use IconJobs</h4>
+            <div class="row g-4 mb-5">
+
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm p-4">
+                        <div class="mb-3 fs-2" style="color:var(--amber)"><i class="bi bi-person-plus"></i></div>
+                        <h5 class="fw-semibold">1. Create Your Account</h5>
+                        <p class="text-muted small mb-0">
+                            Click <strong>Join Free</strong> and choose the <em>Job Seeker</em> role.
+                            Fill in your first name, last name, and a strong password.
+                            Once registered, go to <strong>Edit Profile</strong> to add your bio,
+                            skills, location, and a professional photo — employers read your profile
+                            before they read your CV.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm p-4">
+                        <div class="mb-3 fs-2" style="color:var(--amber)"><i class="bi bi-search"></i></div>
+                        <h5 class="fw-semibold">2. Find the Right Jobs</h5>
+                        <p class="text-muted small mb-0">
+                            Use <strong>Browse Jobs</strong> and apply filters — keyword, location,
+                            job type, and category — to narrow results.
+                            Hit the bookmark icon on any listing to save it for later.
+                            Check <strong>My Applications</strong> from your dashboard to track
+                            every role you've applied to and its current status.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm p-4">
+                        <div class="mb-3 fs-2" style="color:var(--amber)"><i class="bi bi-send"></i></div>
+                        <h5 class="fw-semibold">3. Apply with Confidence</h5>
+                        <p class="text-muted small mb-0">
+                            On the job detail page click <strong>Apply Now</strong>.
+                            Write a tailored cover letter (see CV guide below), attach your CV,
+                            and submit. You can message the employer directly via
+                            <strong>Messages</strong> to ask questions before or after applying.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- CV Section -->
+            <h4 class="fw-semibold mb-4" style="color:var(--amber)">Writing Your Best CV</h4>
+
+            <div class="accordion" id="cvAccordion">
+
+                <div class="accordion-item border mb-2" style="border-radius:var(--radius)!important;overflow:hidden">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button fw-semibold" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#cv1">
+                            <i class="bi bi-file-earmark-person me-2" style="color:var(--amber)"></i>
+                            Tailor your CV to every job
+                        </button>
+                    </h2>
+                    <div id="cv1" class="accordion-collapse collapse show" data-bs-parent="#cvAccordion">
+                        <div class="accordion-body text-muted small">
+                            A generic CV gets ignored. Read the job description carefully and mirror the
+                            language and keywords the employer uses. If they say <em>"stakeholder
+                            management"</em>, use exactly those words — many companies use automated
+                            screening tools that scan for keyword matches before a human ever reads your CV.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item border mb-2" style="border-radius:var(--radius)!important;overflow:hidden">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed fw-semibold" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#cv2">
+                            <i class="bi bi-layout-text-window me-2" style="color:var(--amber)"></i>
+                            Essential CV sections
+                        </button>
+                    </h2>
+                    <div id="cv2" class="accordion-collapse collapse" data-bs-parent="#cvAccordion">
+                        <div class="accordion-body text-muted small">
+                            <ul class="mb-0 ps-3">
+                                <li><strong>Personal Statement (3–4 lines)</strong> — who you are, what you bring, what you're looking for.</li>
+                                <li class="mt-2"><strong>Work Experience</strong> — most recent first. Use bullet points starting with action verbs (<em>Led, Built, Reduced, Delivered</em>). Quantify wherever you can: <em>"Reduced onboarding time by 30%"</em>.</li>
+                                <li class="mt-2"><strong>Education</strong> — degree, institution, year. Include relevant modules only.</li>
+                                <li class="mt-2"><strong>Skills</strong> — hard skills (tools, languages, certifications) and 2–3 soft skills backed by evidence.</li>
+                                <li class="mt-2"><strong>References</strong> — <em>"Available on request"</em> is fine to save space.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item border mb-2" style="border-radius:var(--radius)!important;overflow:hidden">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed fw-semibold" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#cv3">
+                            <i class="bi bi-palette me-2" style="color:var(--amber)"></i>
+                            Formatting tips
+                        </button>
+                    </h2>
+                    <div id="cv3" class="accordion-collapse collapse" data-bs-parent="#cvAccordion">
+                        <div class="accordion-body text-muted small">
+                            Keep it to <strong>one page</strong> (two pages maximum for senior roles).
+                            Use a clean, single-column layout with consistent fonts — avoid tables and
+                            columns as they can break applicant tracking systems (ATS).
+                            Save and send as <strong>PDF</strong> so formatting is preserved on every device.
+                            Name the file <em>FirstName_LastName_CV.pdf</em>.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item border mb-2" style="border-radius:var(--radius)!important;overflow:hidden">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed fw-semibold" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#cv4">
+                            <i class="bi bi-pen me-2" style="color:var(--amber)"></i>
+                            Writing a strong cover letter
+                        </button>
+                    </h2>
+                    <div id="cv4" class="accordion-collapse collapse" data-bs-parent="#cvAccordion">
+                        <div class="accordion-body text-muted small">
+                            Your cover letter answers <em>"Why this role at this company?"</em>.
+                            Open with a specific hook — reference a recent company achievement or
+                            explain exactly why their mission excites you.
+                            In the middle paragraph, connect two or three of your experiences directly
+                            to the job requirements. Close by confirming availability and inviting
+                            a conversation. Keep it under 300 words.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item border" style="border-radius:var(--radius)!important;overflow:hidden">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed fw-semibold" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#cv5">
+                            <i class="bi bi-x-circle me-2" style="color:var(--amber)"></i>
+                            Common mistakes to avoid
+                        </button>
+                    </h2>
+                    <div id="cv5" class="accordion-collapse collapse" data-bs-parent="#cvAccordion">
+                        <div class="accordion-body text-muted small">
+                            <ul class="mb-0 ps-3">
+                                <li>Spelling or grammar errors — always proofread and use a spell-checker.</li>
+                                <li class="mt-1">Generic objectives like <em>"seeking a challenging role"</em> — be specific.</li>
+                                <li class="mt-1">Including a photo (in the UK and many other countries this can introduce unconscious bias).</li>
+                                <li class="mt-1">Listing responsibilities without achievements — show impact, not just duties.</li>
+                                <li class="mt-1">Using a personal email like <em>coolboy1999@hotmail.com</em> — create a professional one.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!-- end CV accordion -->
+
+        </div>
+        <!-- end seeker tab -->
+
+
+        <!-- ===== EMPLOYER TAB ===== -->
+        <div class="tab-pane fade" id="employer" role="tabpanel">
+
+            <h4 class="fw-semibold mb-4" style="color:var(--amber)">How to Post a Job on IconJobs</h4>
+            <div class="row g-4 mb-5">
+
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm p-4">
+                        <div class="mb-3 fs-2" style="color:var(--amber)"><i class="bi bi-building"></i></div>
+                        <h5 class="fw-semibold">1. Set Up Your Employer Profile</h5>
+                        <p class="text-muted small mb-0">
+                            Register with the <em>Employer</em> role and complete your profile.
+                            Add your company name, a professional bio, and a logo or photo.
+                            Candidates research companies before applying — a complete profile
+                            increases application rates significantly.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm p-4">
+                        <div class="mb-3 fs-2" style="color:var(--amber)"><i class="bi bi-plus-square"></i></div>
+                        <h5 class="fw-semibold">2. Create Your Job Post</h5>
+                        <p class="text-muted small mb-0">
+                            Click <strong>+ Post a Job</strong> in the navigation bar.
+                            Fill in every field — title, category, location, salary range, duration,
+                            and a detailed description. The more complete your post, the higher it
+                            ranks in search results and the better-matched your applicants will be.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm p-4">
+                        <div class="mb-3 fs-2" style="color:var(--amber)"><i class="bi bi-people"></i></div>
+                        <h5 class="fw-semibold">3. Manage Applications</h5>
+                        <p class="text-muted small mb-0">
+                            Review all applicants from <strong>My Jobs</strong> on your dashboard.
+                            Update each application status (Under Review, Shortlisted, Rejected,
+                            Offered) to keep candidates informed.
+                            Use <strong>Messages</strong> to communicate directly with promising
+                            candidates and arrange interviews.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Writing the perfect job post -->
+            <h4 class="fw-semibold mb-4" style="color:var(--amber)">Writing the Perfect Job Post</h4>
+
+            <div class="accordion" id="empAccordion">
+
+                <div class="accordion-item border mb-2" style="border-radius:var(--radius)!important;overflow:hidden">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button fw-semibold" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#emp1">
+                            <i class="bi bi-type-h1 me-2" style="color:var(--amber)"></i>
+                            Write a clear, specific job title
+                        </button>
+                    </h2>
+                    <div id="emp1" class="accordion-collapse collapse show" data-bs-parent="#empAccordion">
+                        <div class="accordion-body text-muted small">
+                            Job seekers search by title. Use the standard industry term candidates
+                            are likely to type, e.g. <em>"Software Engineer"</em> not <em>"Code Ninja"</em>.
+                            Include level where relevant: <em>"Junior Frontend Developer"</em> or
+                            <em>"Senior Data Analyst"</em>. Avoid internal jargon, abbreviations,
+                            and all-caps titles.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item border mb-2" style="border-radius:var(--radius)!important;overflow:hidden">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed fw-semibold" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#emp2">
+                            <i class="bi bi-list-check me-2" style="color:var(--amber)"></i>
+                            Include all the information seekers need
+                        </button>
+                    </h2>
+                    <div id="emp2" class="accordion-collapse collapse" data-bs-parent="#empAccordion">
+                        <div class="accordion-body text-muted small">
+                            A complete job post includes:
+                            <ul class="mt-2 mb-0 ps-3">
+                                <li><strong>Salary or salary range</strong> — posts with salary get up to 3× more applicants. If there's a range, state it honestly.</li>
+                                <li class="mt-1"><strong>Location and remote policy</strong> — on-site, hybrid, or fully remote, and the office location.</li>
+                                <li class="mt-1"><strong>Contract type and duration</strong> — full-time, part-time, fixed-term, freelance.</li>
+                                <li class="mt-1"><strong>Start date</strong> — even an approximate date helps candidates plan.</li>
+                                <li class="mt-1"><strong>Key responsibilities</strong> — 5–8 bullet points of what the person will actually do day-to-day.</li>
+                                <li class="mt-1"><strong>Requirements</strong> — split into <em>essential</em> and <em>desirable</em>. Keep the essential list short — every extra requirement reduces your applicant pool.</li>
+                                <li class="mt-1"><strong>What you offer</strong> — benefits, culture, team size, growth opportunities.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item border mb-2" style="border-radius:var(--radius)!important;overflow:hidden">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed fw-semibold" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#emp3">
+                            <i class="bi bi-chat-quote me-2" style="color:var(--amber)"></i>
+                            Tone and language
+                        </button>
+                    </h2>
+                    <div id="emp3" class="accordion-collapse collapse" data-bs-parent="#empAccordion">
+                        <div class="accordion-body text-muted small">
+                            Write in second person (<em>"You will lead..."</em> not <em>"The candidate will lead..."</em>).
+                            Be direct and warm. Avoid excessive corporate language.
+                            Check for <strong>gender-coded words</strong> — terms like "rockstar",
+                            "aggressive", or "dominant" can deter women and other candidates.
+                            Use inclusive language throughout.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item border mb-2" style="border-radius:var(--radius)!important;overflow:hidden">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed fw-semibold" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#emp4">
+                            <i class="bi bi-graph-up me-2" style="color:var(--amber)"></i>
+                            Optimise for search
+                        </button>
+                    </h2>
+                    <div id="emp4" class="accordion-collapse collapse" data-bs-parent="#empAccordion">
+                        <div class="accordion-body text-muted small">
+                            Choose the correct <strong>Category</strong> so your post appears
+                            in filtered searches. Include relevant keywords naturally in the
+                            description — tools, technologies, industry terms.
+                            Posts with complete descriptions and salary information are ranked
+                            higher in search results on IconJobs.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item border" style="border-radius:var(--radius)!important;overflow:hidden">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed fw-semibold" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#emp5">
+                            <i class="bi bi-clock-history me-2" style="color:var(--amber)"></i>
+                            Respond to applicants promptly
+                        </button>
+                    </h2>
+                    <div id="emp5" class="accordion-collapse collapse" data-bs-parent="#empAccordion">
+                        <div class="accordion-body text-muted small">
+                            Top candidates are often off the market within days.
+                            Aim to review applications within <strong>48 hours</strong> and keep
+                            every applicant informed of their status — even a rejection message
+                            protects your employer brand.
+                            Use the <strong>Messages</strong> feature to move fast with strong candidates.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!-- end employer accordion -->
+
+        </div>
+        <!-- end employer tab -->
+
+    </div><!-- tab-content -->
+
+    <!-- CTA row -->
+    <div class="row g-3 mt-5 text-center">
+        <div class="col-md-6">
+            <div class="p-4 rounded-3 border">
+                <h5 class="fw-semibold mb-2">Ready to find your next job?</h5>
+                <a href="/jobs/" class="btn btn-primary px-4">Browse Jobs</a>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="p-4 rounded-3 border">
+                <h5 class="fw-semibold mb-2">Ready to hire great talent?</h5>
+                <a href="/jobs/post/" class="btn btn-primary px-4">Post a Job</a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<style>
+    .accordion-button:not(.collapsed) { background: rgba(232,160,32,0.08); color: inherit; box-shadow: none; }
+    .accordion-button::after { filter: invert(var(--bs-dark-mode-invert, 0)); }
+    .nav-pills .nav-link { background: transparent; border: 1px solid var(--border); color: var(--text-muted); border-radius: 50px; }
+    .nav-pills .nav-link.active { background: var(--amber); border-color: var(--amber); color: #000; font-weight: 600; }
+</style>
+{% endblock %}

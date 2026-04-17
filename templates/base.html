@@ -355,6 +355,9 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto ms-3 gap-1">
                 <li class="nav-item"><a class="nav-link" href="/jobs/">Browse Jobs</a></li>
+                <li class="nav-item"><a class="nav-link" href="/career-guide/">Career Guide</a></li>
+                <li class="nav-item"><a class="nav-link" href="/about/">About</a></li>
+                <li class="nav-item"><a class="nav-link" href="/contact/">Contact</a></li>
                 {% if user.is_authenticated %}
                     {% if user.profile.role == 'jobseeker' %}
                         <li class="nav-item"><a class="nav-link" href="/jobseeker/dashboard/">My Applications</a></li>

@@ -9,6 +9,27 @@ from accounts.models import UserProfile
 from chat.models import Conversation, Message
 
 
+def career_guide(request):
+    return render(request, 'jobs/career_guide.html')
+
+
+def about(request):
+    return render(request, 'jobs/about.html')
+
+
+def contact(request):
+    submitted = False
+    if request.method == 'POST':
+        submitted = True
+    role = None
+    if request.user.is_authenticated:
+        try:
+            role = request.user.profile.role
+        except Exception:
+            pass
+    return render(request, 'jobs/contact.html', {'submitted': submitted, 'role': role})
+
+
 def home(request):
     trending_jobs = Job.objects.filter(status='open').order_by('-applications_count', '-views')[:6]
     recent_jobs = Job.objects.filter(status='open').order_by('-created_at')[:6]
