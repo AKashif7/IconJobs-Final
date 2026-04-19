@@ -17,12 +17,12 @@
             <div class="d-flex align-items-center justify-content-between mb-1">
                 <h5>Messages</h5>
                 {% if total_unread > 0 %}
-                <span style="background:#e53935;color:#fff;font-size:0.7rem;font-weight:800;padding:2px 9px;border-radius:99px">
+                <span style="background:#e53935;color:#fff;font-size:0.68rem;font-weight:800;padding:2px 9px;border-radius:99px">
                     {{ total_unread }} unread
                 </span>
                 {% endif %}
             </div>
-            <p style="font-size:0.75rem;color:var(--slate-light);margin:0">Your accepted job conversations</p>
+            <p style="font-size:0.73rem;color:var(--slate-light);margin:0">Accepted job conversations</p>
         </div>
 
         <div class="chat-sidebar-list">
@@ -31,8 +31,6 @@
                 {% with conv=item.conv other=item.other_user op=item.other_profile unread=item.unread %}
                 <a href="/chat/inbox/{{ conv.pk }}/"
                    class="conv-item {% if active_conv and active_conv.pk == conv.pk %}active{% endif %}">
-
-                    <!-- Avatar with online dot -->
                     <div class="online-wrap">
                         {% if op and op.profile_picture %}
                             <img src="{{ op.profile_picture.url }}" class="avatar-img" alt="">
@@ -41,12 +39,8 @@
                         {% endif %}
                         <span class="offline-dot" data-uid="{{ other.pk }}"></span>
                     </div>
-
-                    <!-- Info -->
                     <div class="conv-item-info">
-                        <div class="conv-item-name">
-                            {{ other.get_full_name|default:other.username }}
-                        </div>
+                        <div class="conv-item-name">{{ other.get_full_name|default:other.username }}</div>
                         <div class="conv-item-preview {% if unread > 0 %}unread-preview{% endif %}">
                             {% if conv.last_message %}
                                 {% if conv.last_message.sender == request.user %}You: {% endif %}
@@ -55,12 +49,10 @@
                                 <em style="font-style:italic;opacity:0.6">No messages yet</em>
                             {% endif %}
                         </div>
-                        <div style="font-size:0.7rem;color:var(--amber-dark);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
-                            {{ conv.application.job.title|truncatechars:38 }}
+                        <div style="font-size:0.68rem;color:var(--amber-dark);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+                            {{ conv.application.job.title|truncatechars:36 }}
                         </div>
                     </div>
-
-                    <!-- Right side: time + unread -->
                     <div class="conv-item-right">
                         <span class="conv-item-time">
                             {% if conv.last_message %}{{ conv.last_message.created_at|date:"d M" }}{% endif %}
@@ -74,8 +66,8 @@
                 {% endfor %}
             {% else %}
                 <div style="padding:2.5rem 1.25rem;text-align:center;color:var(--slate-light)">
-                    <i class="bi bi-chat-dots" style="font-size:2.5rem;display:block;margin-bottom:0.75rem;opacity:0.3"></i>
-                    <p style="font-size:0.85rem;line-height:1.6">No conversations yet.<br>Chats open when an employer accepts an application.</p>
+                    <i class="bi bi-chat-dots" style="font-size:2.5rem;display:block;margin-bottom:0.75rem;opacity:0.25"></i>
+                    <p style="font-size:0.83rem;line-height:1.65">No conversations yet.<br>Chats open when an employer accepts an application.</p>
                     <a href="/jobs/" class="btn btn-amber btn-sm mt-2">Browse Jobs</a>
                 </div>
             {% endif %}
@@ -87,45 +79,34 @@
         {% if active_conv %}
         {% with app=active_conv.application %}
 
-            <!-- Header bar -->
             <div class="chat-main-header">
                 <a href="/chat/inbox/" class="d-md-none" style="color:var(--ink);margin-right:0.5rem">
-                    <i class="bi bi-arrow-left" style="font-size:1.2rem"></i>
+                    <i class="bi bi-arrow-left" style="font-size:1.1rem"></i>
                 </a>
-
-                <!-- Avatar — double-click goes to full profile -->
-                <div class="online-wrap"
-                     style="cursor:pointer;flex-shrink:0"
+                <div class="online-wrap" style="cursor:pointer;flex-shrink:0"
                      ondblclick="window.location='/accounts/profile/{{ active_other.username }}/'"
                      title="Double-click to view full profile">
                     {% if active_other_profile and active_other_profile.profile_picture %}
-                        <img src="{{ active_other_profile.profile_picture.url }}"
-                             class="avatar-img" alt="">
+                        <img src="{{ active_other_profile.profile_picture.url }}" class="avatar-img" alt="">
                     {% else %}
                         <div class="avatar">{{ active_other.first_name.0|default:active_other.username.0|upper }}</div>
                     {% endif %}
                     <span class="offline-dot" id="headerDot" data-uid="{{ active_other.pk }}"></span>
                 </div>
-
-                <!-- Name + online status -->
                 <div class="chat-main-header-info">
                     <div class="chat-main-name">
-                        <!-- Single click = profile page -->
-                        <a href="/accounts/profile/{{ active_other.username }}/"
-                           style="color:inherit;text-decoration:none"
-                           title="View profile">
+                        <a href="/accounts/profile/{{ active_other.username }}/" style="color:inherit;text-decoration:none">
                             {{ active_other.get_full_name|default:active_other.username }}
                         </a>
                         {% if active_other_profile and active_other_profile.company_name %}
-                        <span style="font-weight:400;font-size:0.82rem;color:var(--amber-dark)"> — {{ active_other_profile.company_name }}</span>
+                        <span style="font-weight:400;font-size:0.78rem;color:var(--amber-dark)"> — {{ active_other_profile.company_name }}</span>
                         {% endif %}
                     </div>
-                    <!-- Star rating mini display -->
                     {% if active_other_profile %}
                     {% with r=active_other_profile.average_rating %}
                     {% if r %}
-                    <div style="font-size:0.75rem;color:var(--slate-light);display:flex;align-items:center;gap:4px">
-                        <i class="bi bi-star-fill" style="color:var(--amber);font-size:0.7rem"></i>
+                    <div style="font-size:0.72rem;color:var(--slate-light);display:flex;align-items:center;gap:4px">
+                        <i class="bi bi-star-fill" style="color:var(--amber);font-size:0.68rem"></i>
                         <strong style="color:var(--ink)">{{ r }}</strong>
                         <span>({{ active_other_profile.ratings_received.count }} review{{ active_other_profile.ratings_received.count|pluralize }})</span>
                         &bull;
@@ -134,38 +115,33 @@
                     {% endif %}
                     {% endwith %}
                     {% endif %}
-                    <!-- Online status text -->
                     <div class="chat-main-status" id="headerOnlineText">
                         <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--border);margin-right:4px"></span>
                         <span class="offline-text">Checking...</span>
                     </div>
                 </div>
-
-                <!-- Actions -->
                 <div class="d-flex gap-2 align-items-center">
                     <a href="/accounts/profile/{{ active_other.username }}/" class="btn btn-outline-ink btn-sm">
-                        <i class="bi bi-person me-1"></i>Full Profile
+                        <i class="bi bi-person me-1"></i>Profile
                     </a>
                     <span class="status-badge status-{{ app.status }}">{{ app.get_status_display }}</span>
                 </div>
             </div>
 
-            <!-- Contact reveal banner (only shows if accepted + revealed) -->
             {% if show_contact and active_other_profile %}
             <div class="contact-banner">
-                <i class="bi bi-unlock-fill" style="color:var(--amber-dark);font-size:0.95rem"></i>
+                <i class="bi bi-unlock-fill" style="color:var(--amber-dark);font-size:0.9rem"></i>
                 <strong>Contact unlocked:</strong>
                 <span><i class="bi bi-envelope me-1"></i>{{ active_other.email }}</span>
                 {% if active_other_profile.reveal_phone and active_other_profile.phone %}
                 <span><i class="bi bi-telephone me-1"></i>{{ active_other_profile.phone }}</span>
                 {% endif %}
-                <a href="/accounts/profile/{{ active_other.username }}/" style="margin-left:auto;font-size:0.78rem;color:var(--amber-dark);font-weight:600">
+                <a href="/accounts/profile/{{ active_other.username }}/" style="margin-left:auto;font-size:0.75rem;color:var(--amber-dark);font-weight:700">
                     View full profile &rarr;
                 </a>
             </div>
             {% endif %}
 
-            <!-- Messages scroll area -->
             <div class="chat-messages" id="chatMessages">
                 {% for msg in active_messages %}
                     {% if msg.is_system %}
@@ -181,13 +157,11 @@
                         </div>
                     {% else %}
                         <div class="d-flex align-items-end gap-2">
-                            <!-- Their avatar on message -->
                             {% if active_other_profile and active_other_profile.profile_picture %}
                                 <img src="{{ active_other_profile.profile_picture.url }}"
-                                     style="width:30px;height:30px;border-radius:50%;object-fit:cover;flex-shrink:0"
-                                     alt="">
+                                     style="width:30px;height:30px;border-radius:50%;object-fit:cover;flex-shrink:0" alt="">
                             {% else %}
-                                <div class="avatar" style="width:30px;height:30px;font-size:0.75rem;flex-shrink:0">
+                                <div class="avatar" style="width:30px;height:30px;font-size:0.72rem;flex-shrink:0">
                                     {{ active_other.first_name.0|default:active_other.username.0|upper }}
                                 </div>
                             {% endif %}
@@ -199,17 +173,15 @@
                     {% endif %}
                 {% empty %}
                     <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--slate-light);gap:0.5rem">
-                        <i class="bi bi-chat-dots" style="font-size:2.5rem;opacity:0.25"></i>
+                        <i class="bi bi-chat-dots" style="font-size:2.5rem;opacity:0.2"></i>
                         <p style="font-size:0.875rem">No messages yet — say hello!</p>
                     </div>
                 {% endfor %}
             </div>
 
-            <!-- Input area -->
             <div class="chat-input-area">
-                <!-- Quick-reply buttons -->
                 <div class="quick-btns">
-                    <span style="font-size:0.72rem;color:var(--slate-light);align-self:center;flex-shrink:0">Quick:</span>
+                    <span style="font-size:0.7rem;color:var(--slate-light);align-self:center;flex-shrink:0;font-weight:600">Quick:</span>
                     {% if is_employer %}
                     <button class="quick-btn" onclick="insertQuick('Please arrive at 9:00 AM.')">📍 Arrival time</button>
                     <button class="quick-btn" onclick="insertQuick('Please wear smart casual clothing.')">👔 Dress code</button>
@@ -222,16 +194,10 @@
                     <button class="quick-btn" onclick="insertQuick('Is there anything specific I should bring?')">🎒 What to bring</button>
                     {% endif %}
                 </div>
-
                 <form method="POST" action="/chat/inbox/{{ active_conv.pk }}/" class="d-flex gap-2">
                     {% csrf_token %}
-                    <input type="text"
-                           name="content"
-                           id="msgInput"
-                           class="form-control"
-                           placeholder="Type a message..."
-                           autocomplete="off"
-                           required>
+                    <input type="text" name="content" id="msgInput" class="form-control"
+                           placeholder="Type a message..." autocomplete="off" required>
                     <button type="submit" class="btn btn-amber px-4">
                         <i class="bi bi-send-fill"></i>
                     </button>
@@ -240,12 +206,11 @@
 
         {% endwith %}
         {% else %}
-            <!-- No active conversation -->
             <div class="chat-empty">
-                <i class="bi bi-chat-square-dots" style="font-size:4rem;opacity:0.15"></i>
-                <h5 style="font-family:'Syne',sans-serif;font-weight:700;color:var(--slate)">Your messages</h5>
-                <p style="font-size:0.875rem;color:var(--slate-light);text-align:center;max-width:260px">
-                    Select a conversation from the left panel to read and reply
+                <i class="bi bi-chat-square-dots" style="font-size:4rem;opacity:0.12"></i>
+                <h5 style="font-weight:800;color:var(--slate)">Your messages</h5>
+                <p style="font-size:0.875rem;color:var(--slate-light);text-align:center;max-width:260px;line-height:1.65">
+                    Select a conversation from the left to read and reply
                 </p>
             </div>
         {% endif %}
@@ -256,74 +221,54 @@
 
 {% block extra_js %}
 <script>
-// ── Scroll messages to bottom on load ──
 const chatBox = document.getElementById('chatMessages');
 if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
 
-// ── Quick reply ──
 function insertQuick(text) {
     const el = document.getElementById('msgInput');
     if (el) { el.value = text; el.focus(); }
 }
 
-// ── Online status polling ──
 function formatLastSeen(isoStr) {
     if (!isoStr) return 'Offline';
     const d = new Date(isoStr);
-    const now = new Date();
-    const s = Math.floor((now - d) / 1000);
+    const s = Math.floor((new Date() - d) / 1000);
     if (s < 60)    return 'Last seen just now';
     if (s < 3600)  return 'Last seen ' + Math.floor(s/60) + 'm ago';
     if (s < 86400) return 'Last seen ' + Math.floor(s/3600) + 'h ago';
     return 'Last seen ' + d.toLocaleDateString('en-GB', {day:'numeric', month:'short'});
 }
-
 function setDotOnline(dot, online) {
     if (!dot) return;
     dot.className = online ? 'online-dot' : 'offline-dot';
 }
-
 function updateHeaderStatus(online, lastSeen) {
     const wrap = document.getElementById('headerOnlineText');
     if (!wrap) return;
-    const dotColor  = online ? '#22c55e' : 'var(--border)';
-    const dotSpan   = `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${dotColor};margin-right:5px;vertical-align:middle"></span>`;
-    if (online) {
-        wrap.innerHTML = dotSpan + '<span class="online-text">Online now</span>';
-    } else {
-        wrap.innerHTML = dotSpan + '<span class="offline-text">' + formatLastSeen(lastSeen) + '</span>';
-    }
+    const c = online ? '#22c55e' : 'var(--border)';
+    const dot = `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${c};margin-right:5px;vertical-align:middle"></span>`;
+    wrap.innerHTML = online
+        ? dot + '<span class="online-text">Online now</span>'
+        : dot + '<span class="offline-text">' + formatLastSeen(lastSeen) + '</span>';
 }
 
-// Gather all unique uids on the page
 const uids = new Set();
-document.querySelectorAll('[data-uid]').forEach(el => {
-    if (el.dataset.uid) uids.add(el.dataset.uid);
-});
+document.querySelectorAll('[data-uid]').forEach(el => { if (el.dataset.uid) uids.add(el.dataset.uid); });
 
 function pollOnline() {
     uids.forEach(uid => {
         fetch('/chat/api/online/?uid=' + uid)
             .then(r => r.json())
             .then(data => {
-                // Update all sidebar dots for this uid
-                document.querySelectorAll('[data-uid="' + uid + '"]').forEach(dot => {
-                    setDotOnline(dot, data.online);
-                });
-                // Update main header if this uid is the active chat partner
-                const headerDot = document.getElementById('headerDot');
-                if (headerDot && headerDot.dataset.uid === uid) {
-                    setDotOnline(headerDot, data.online);
+                document.querySelectorAll('[data-uid="' + uid + '"]').forEach(dot => setDotOnline(dot, data.online));
+                const hd = document.getElementById('headerDot');
+                if (hd && hd.dataset.uid === uid) {
+                    setDotOnline(hd, data.online);
                     updateHeaderStatus(data.online, data.last_seen);
                 }
-            })
-            .catch(() => {});
+            }).catch(() => {});
     });
 }
-
-if (uids.size > 0) {
-    pollOnline();
-    setInterval(pollOnline, 20000);
-}
+if (uids.size > 0) { pollOnline(); setInterval(pollOnline, 20000); }
 </script>
 {% endblock %}

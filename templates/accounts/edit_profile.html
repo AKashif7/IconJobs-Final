@@ -1,13 +1,24 @@
 {% extends 'base.html' %}
 {% block title %}Edit Profile — IconJobs{% endblock %}
 {% block content %}
-<div class="container py-4" style="max-width:640px">
-  <a href="/accounts/profile/" style="font-size:0.875rem;color:var(--amber-dark);font-weight:600;text-decoration:none"><i class="bi bi-arrow-left me-1"></i>Back to Profile</a>
-  <div class="card mt-3 p-4">
-    <h2 style="font-family:'Syne',sans-serif;font-weight:800;margin-bottom:1.5rem">Edit Your Profile</h2>
-    <form method="POST" enctype="multipart/form-data">
+<div class="container py-5" style="max-width:680px">
+
+  <a href="/accounts/profile/" style="font-size:0.85rem;color:var(--amber-dark);font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:4px;margin-bottom:1.5rem">
+    <i class="bi bi-arrow-left"></i> Back to Profile
+  </a>
+
+  <div class="card" style="padding:2rem 2.25rem">
+    <div style="margin-bottom:2rem">
+      <h2 style="font-weight:800;font-size:1.6rem;letter-spacing:-0.03em;margin-bottom:0.25rem">Edit Your Profile</h2>
+      <p style="color:var(--slate-light);font-size:0.875rem">Keep your profile up to date to get the best results on IconJobs.</p>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" novalidate>
       {% csrf_token %}
-      <div class="row g-3">
+
+      <!-- PERSONAL INFO -->
+      <p class="form-section-label">Personal Information</p>
+      <div class="row g-3 mb-4">
         <div class="col-md-6">
           <label class="form-label">First Name</label>
           {{ form.first_name }}
@@ -17,41 +28,67 @@
           {{ form.last_name }}
         </div>
         <div class="col-12">
-          <label class="form-label">Email</label>
+          <label class="form-label">Email Address</label>
           {{ form.email }}
         </div>
         <div class="col-12">
           <label class="form-label">Bio</label>
           {{ form.bio }}
         </div>
+      </div>
+
+      <!-- LOCATION & CONTACT -->
+      <div style="height:1px;background:var(--border);margin-bottom:1.5rem"></div>
+      <p class="form-section-label">Location & Contact</p>
+      <div class="row g-3 mb-4">
         <div class="col-md-6">
           <label class="form-label">Location</label>
           {{ form.location }}
         </div>
         <div class="col-md-6">
-          <label class="form-label">Phone</label>
+          <label class="form-label">Phone Number</label>
           {{ form.phone }}
         </div>
-        <div class="col-12">
-          <label class="form-label">Profile Picture</label>
-          {{ form.profile_picture }}
-        </div>
+      </div>
 
-        {% if profile.role == 'jobseeker' %}
+      <!-- PROFILE PICTURE -->
+      <div style="height:1px;background:var(--border);margin-bottom:1.5rem"></div>
+      <p class="form-section-label">Profile Picture</p>
+      <div class="mb-4">
+        {{ form.profile_picture }}
+        <div class="form-text">Accepted: JPG, PNG, GIF. Max 5MB. Square images work best.</div>
+      </div>
+
+      <!-- ROLE-SPECIFIC FIELDS -->
+      {% if profile.role == 'jobseeker' %}
+      <div style="height:1px;background:var(--border);margin-bottom:1.5rem"></div>
+      <p class="form-section-label">Skills & Experience</p>
+      <div class="row g-3 mb-4">
         <div class="col-12">
-          <label class="form-label">CV (PDF)</label>
-          {{ form.cv }}
-          {% if profile.cv %}<small class="text-muted">Current: <a href="{{ profile.cv.url }}">{{ profile.cv.name }}</a></small>{% endif %}
-        </div>
-        <div class="col-12">
-          <label class="form-label">Skills (comma separated)</label>
+          <label class="form-label">Skills</label>
           {{ form.skills }}
+          <div class="form-text">Separate skills with commas — e.g. <em>Customer Service, Excel, Forklift Licence</em></div>
         </div>
         <div class="col-12">
           <label class="form-label">Availability</label>
           {{ form.availability }}
+          <div class="form-text">Tell employers when you're free to work.</div>
         </div>
-        {% elif profile.role == 'employer' %}
+        <div class="col-12">
+          <label class="form-label">CV / Resume (PDF)</label>
+          {{ form.cv }}
+          {% if profile.cv %}
+          <div class="form-text">
+            Current file: <a href="{{ profile.cv.url }}" target="_blank" style="color:var(--amber-dark);font-weight:600">{{ profile.cv.name }}</a>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      {% elif profile.role == 'employer' %}
+      <div style="height:1px;background:var(--border);margin-bottom:1.5rem"></div>
+      <p class="form-section-label">Company Information</p>
+      <div class="row g-3 mb-4">
         <div class="col-12">
           <label class="form-label">Company Name</label>
           {{ form.company_name }}
@@ -64,26 +101,35 @@
           <label class="form-label">Website</label>
           {{ form.website }}
         </div>
-        {% endif %}
+      </div>
+      {% endif %}
 
-        <div class="col-12">
-          <div style="background:var(--paper);border-radius:var(--radius-sm);padding:1rem">
-            <strong style="font-size:0.875rem">Privacy Settings</strong>
-            <p style="font-size:0.8rem;color:var(--slate-light);margin:0.25rem 0 0.75rem">Contact details are only revealed to employers who accept you.</p>
-            <div class="form-check">
-              {{ form.reveal_phone }}
-              <label class="form-check-label" for="{{ form.reveal_phone.id_for_label }}" style="font-size:0.875rem">Allow accepted employers to see my phone number</label>
-            </div>
-            <div class="form-check mt-1">
-              {{ form.reveal_email }}
-              <label class="form-check-label" for="{{ form.reveal_email.id_for_label }}" style="font-size:0.875rem">Allow accepted employers to see my email</label>
-            </div>
-          </div>
+      <!-- PRIVACY SETTINGS -->
+      <div style="height:1px;background:var(--border);margin-bottom:1.5rem"></div>
+      <p class="form-section-label">Privacy Settings</p>
+      <div style="background:var(--paper);border-radius:var(--radius-sm);border:1px solid var(--border);padding:1.25rem 1.25rem;margin-bottom:2rem">
+        <p style="font-size:0.82rem;color:var(--slate-light);margin-bottom:1rem">
+          <i class="bi bi-shield-lock me-1"></i>
+          Your contact details are <strong>never shown publicly</strong>. They are only revealed to employers who have accepted your application.
+        </p>
+        <div class="form-check mb-2">
+          {{ form.reveal_phone }}
+          <label class="form-check-label" for="{{ form.reveal_phone.id_for_label }}">
+            Allow accepted employers to see my phone number
+          </label>
+        </div>
+        <div class="form-check">
+          {{ form.reveal_email }}
+          <label class="form-check-label" for="{{ form.reveal_email.id_for_label }}">
+            Allow accepted employers to see my email address
+          </label>
         </div>
       </div>
 
-      <div class="d-flex gap-2 mt-4">
-        <button type="submit" class="btn btn-amber btn-lg flex-grow-1"><i class="bi bi-check-lg me-1"></i>Save Changes</button>
+      <div class="d-flex gap-3">
+        <button type="submit" class="btn btn-amber btn-lg flex-grow-1">
+          <i class="bi bi-check-lg me-1"></i>Save Changes
+        </button>
         <a href="/accounts/profile/" class="btn btn-outline-ink btn-lg">Cancel</a>
       </div>
     </form>

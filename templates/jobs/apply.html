@@ -1,46 +1,58 @@
 {% extends 'base.html' %}
 {% block title %}Apply — {{ job.title }} — IconJobs{% endblock %}
 {% block content %}
-<div class="container py-4" style="max-width:680px">
-  <a href="/jobs/{{ job.pk }}/" style="font-size:0.875rem;color:var(--amber-dark);font-weight:600;text-decoration:none"><i class="bi bi-arrow-left me-1"></i>Back to Job</a>
-  <div class="card mt-3 p-4">
-    <div style="background:var(--paper);border-radius:var(--radius-sm);padding:1rem;margin-bottom:1.5rem">
-      <h5 style="font-family:'Syne',sans-serif;font-weight:700;margin-bottom:0.25rem">{{ job.title }}</h5>
-      <span style="font-size:0.85rem;color:var(--slate-light)">
-        <i class="bi bi-geo-alt me-1"></i>{{ job.location }} &bull;
-        <i class="bi bi-clock me-1"></i>{{ job.get_duration_display }} &bull;
-        £{{ job.pay_rate }}/{{ job.pay_type }}
-      </span>
+<div class="container py-5" style="max-width:700px">
+
+  <a href="/jobs/{{ job.pk }}/" style="font-size:0.85rem;color:var(--amber-dark);font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:4px;margin-bottom:1.5rem">
+    <i class="bi bi-arrow-left"></i> Back to Job
+  </a>
+
+  <div class="card" style="padding:2rem 2.25rem">
+
+    <!-- Job summary banner -->
+    <div style="background:var(--paper);border-radius:var(--radius-sm);padding:1.1rem 1.25rem;margin-bottom:2rem;border:1px solid var(--border)">
+      <h5 style="font-weight:800;margin-bottom:0.4rem">{{ job.title }}</h5>
+      <div style="display:flex;gap:1.25rem;flex-wrap:wrap;font-size:0.82rem;color:var(--slate-light)">
+        <span><i class="bi bi-geo-alt me-1"></i>{{ job.location }}</span>
+        <span><i class="bi bi-clock me-1"></i>{{ job.get_duration_display }}</span>
+        <span style="color:var(--success);font-weight:700">£{{ job.pay_rate }}/{{ job.pay_type }}</span>
+      </div>
     </div>
 
-    <h4 style="font-family:'Syne',sans-serif;font-weight:800;margin-bottom:0.25rem">Submit Your Application</h4>
-    <p style="color:var(--slate-light);font-size:0.875rem;margin-bottom:1.5rem">Your profile, rating, and previous jobs completed will be shared with the employer.</p>
+    <h4 style="font-weight:800;font-size:1.35rem;letter-spacing:-0.02em;margin-bottom:0.35rem">Submit Your Application</h4>
+    <p style="color:var(--slate-light);font-size:0.875rem;margin-bottom:2rem">
+      Your profile, star rating, and jobs-completed count will be shared with the employer automatically.
+    </p>
 
-    <form method="POST" enctype="multipart/form-data">
+    <form method="POST" novalidate>
       {% csrf_token %}
-      <div class="mb-3">
-        <label class="form-label">{{ form.cover_message.label }}</label>
+
+      <div class="mb-4">
+        <label class="form-label">Cover Message</label>
         {{ form.cover_message }}
-        {% if form.cover_message.errors %}<div class="text-danger" style="font-size:0.8rem">{{ form.cover_message.errors }}</div>{% endif %}
+        <div class="form-text">Optional but recommended. A strong message can set you apart from other applicants.</div>
+        {% if form.cover_message.errors %}
+        <div class="form-text text-danger">{{ form.cover_message.errors.0 }}</div>
+        {% endif %}
       </div>
 
-      <div style="background:var(--amber-light);border-radius:var(--radius-sm);padding:1rem;margin-bottom:1.5rem;font-size:0.875rem">
+      <div style="background:var(--amber-light);border-radius:var(--radius-sm);padding:1.1rem 1.25rem;margin-bottom:2rem;font-size:0.85rem;border:1px solid rgba(232,160,32,0.25)">
         <strong><i class="bi bi-info-circle me-1"></i>What the employer will see:</strong>
-        <ul style="margin:0.5rem 0 0;padding-left:1.2rem">
-          <li>Your name and profile</li>
-          <li>Your star rating (if any)</li>
-          <li>Number of previous jobs completed</li>
-          <li>Your CV (if uploaded on your profile)</li>
+        <ul style="margin:0.6rem 0 0;padding-left:1.25rem;line-height:2">
+          <li>Your name and profile information</li>
+          <li>Your star rating and number of previous jobs completed</li>
+          <li>Your uploaded CV (if you've added one to your profile)</li>
           <li>Your cover message above</li>
         </ul>
-        <p style="margin-top:0.5rem;margin-bottom:0"><strong>Contact details are hidden</strong> until an employer accepts you.</p>
-      </div>
-
-      <div class="d-flex gap-2">
-        <button type="submit" class="btn btn-amber btn-lg flex-grow-1">Submit Application <i class="bi bi-send ms-1"></i></button>
-        <a href="/jobs/{{ job.pk }}/" class="btn btn-outline-ink btn-lg">Cancel</a>
-      </div>
-    </form>
+        <p style="margin:0.75rem 0 0;color:var(--amber-dark);font-weight:600">
+          <i class="bi bi-shield-lock me-1"></i>Contact details (phone, email) are hidden until an employer accepts you.
+             </p>
   </div>
-</div>
-{% endblock %}
+    <div class="d-flex gap-3">
+    <button type="submit" class="btn btn-amber btn-lg flex-grow-1">
+      Submit Application <i class="bi bi-send ms-1"></i>
+    </button>
+    <a href="/jobs/{{ job.pk }}/" class="btn btn-outline-ink btn-lg">Cancel</a>
+  </div>
+</form>
+</div> </div> {% endblock %} ```

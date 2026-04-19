@@ -1,27 +1,41 @@
 {% extends 'base.html' %}
-{% block title %}Login — IconJobs{% endblock %}
+{% block title %}Sign In — IconJobs{% endblock %}
 {% block content %}
-<div class="container py-5" style="max-width:440px">
-  <div class="text-center mb-4">
-    <h1 style="font-family:'Syne',sans-serif;font-weight:800;font-size:2rem">Welcome Back</h1>
-    <p style="color:var(--slate-light)">Sign in to your IconJobs account</p>
+<div class="container py-5" style="max-width:460px">
+
+  <div class="text-center mb-5">
+    <div style="font-size:2.2rem;margin-bottom:0.5rem">👋</div>
+    <h1 style="font-weight:800;font-size:2rem;letter-spacing:-0.03em">Welcome Back</h1>
+    <p style="color:var(--slate-light);margin-top:0.4rem;font-size:0.95rem">Sign in to your IconJobs account</p>
   </div>
-  <div class="card p-4">
-    <form method="POST">
+
+  <div class="card" style="padding:2rem 2.25rem">
+    <form method="POST" novalidate>
       {% csrf_token %}
-      <div class="mb-3">
-        <label class="form-label">Username</label>
+
+      <div class="mb-4">
+        <label class="form-label" for="{{ form.username.id_for_label }}">Username</label>
         {{ form.username }}
       </div>
-      <div class="mb-3">
-        <label class="form-label">Password</label>
+
+      <div class="mb-2">
+        <label class="form-label" for="{{ form.password.id_for_label }}">Password</label>
         {{ form.password }}
-        {% if form.non_field_errors %}<div class="text-danger" style="font-size:0.85rem;margin-top:4px">{{ form.non_field_errors }}</div>{% endif %}
       </div>
-      <button type="submit" class="btn btn-amber w-100 btn-lg">Sign In <i class="bi bi-arrow-right ms-1"></i></button>
+
+      {% if form.non_field_errors %}
+      <div class="alert alert-danger mt-3 mb-3" style="font-size:0.85rem">
+        <i class="bi bi-exclamation-circle me-1"></i>{{ form.non_field_errors.0 }}
+      </div>
+      {% endif %}
+
+      <button type="submit" class="btn btn-amber btn-lg w-100 mt-4">
+        Sign In <i class="bi bi-arrow-right ms-1"></i>
+      </button>
     </form>
-    <p class="text-center mt-3" style="font-size:0.875rem;color:var(--slate-light)">
-      New here? <a href="/accounts/register/" style="color:var(--amber-dark);font-weight:600">Create a free account</a>
+
+    <p class="text-center mt-4" style="font-size:0.875rem;color:var(--slate-light)">
+      New to IconJobs? <a href="/accounts/register/" style="color:var(--amber-dark);font-weight:700">Create a free account</a>
     </p>
   </div>
 </div>

@@ -5,14 +5,62 @@ from .models import UserProfile, Rating
 
 
 class RegisterForm(UserCreationForm):
-    email = forms.EmailField(required=True)
-    first_name = forms.CharField(max_length=50, required=True)
-    last_name = forms.CharField(max_length=50, required=True)
-    role = forms.ChoiceField(choices=UserProfile.ROLE_CHOICES)
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control form-control-lg',
+            'placeholder': 'your@email.com'
+        })
+    )
+    first_name = forms.CharField(
+        max_length=50, required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control form-control-lg',
+            'placeholder': 'First name'
+        })
+    )
+    last_name = forms.CharField(
+        max_length=50, required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control form-control-lg',
+            'placeholder': 'Last name'
+        })
+    )
+    role = forms.ChoiceField(
+        choices=UserProfile.ROLE_CHOICES,
+        widget=forms.Select(attrs={'class': 'form-select form-select-lg'})
+    )
+    agree_terms = forms.BooleanField(
+        required=True,
+        error_messages={
+            'required': 'Please accept the Terms & Conditions to create an account.'
+        }
+    )
+    agree_authentic = forms.BooleanField(
+        required=True,
+        error_messages={
+            'required': 'You must confirm that your profile information is 100% authentic.'
+        }
+    )
 
     class Meta:
         model = User
         fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2', 'role')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs.update({
+            'class': 'form-control form-control-lg',
+            'placeholder': 'Choose a username'
+        })
+        self.fields['password1'].widget.attrs.update({
+            'class': 'form-control form-control-lg',
+            'placeholder': 'Create a strong password'
+        })
+        self.fields['password2'].widget.attrs.update({
+            'class': 'form-control form-control-lg',
+            'placeholder': 'Confirm your password'
+        })
 
     def save(self, commit=True):
         user = super().save(commit=False)
@@ -26,22 +74,69 @@ class RegisterForm(UserCreationForm):
 
 
 class LoginForm(AuthenticationForm):
-    pass
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs.update({
+            'class': 'form-control form-control-lg',
+            'placeholder': 'Your username'
+        })
+        self.fields['password'].widget.attrs.update({
+            'class': 'form-control form-control-lg',
+            'placeholder': 'Your password'
+        })
 
 
 class ProfileEditForm(forms.ModelForm):
-    first_name = forms.CharField(max_length=50)
-    last_name = forms.CharField(max_length=50)
-    email = forms.EmailField()
+    first_name = forms.CharField(
+        max_length=50,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'First name'})
+    )
+    last_name = forms.CharField(
+        max_length=50,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Last name'})
+    )
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'your@email.com'})
+    )
 
     class Meta:
         model = UserProfile
-        fields = ['bio', 'location', 'phone', 'profile_picture', 'cv',
-                  'skills', 'availability', 'company_name', 'company_description',
-                  'website', 'reveal_phone', 'reveal_email']
+        fields = [
+            'bio', 'location', 'phone', 'profile_picture', 'cv',
+            'skills', 'availability', 'company_name', 'company_description',
+            'website', 'reveal_phone', 'reveal_email'
+        ]
         widgets = {
-            'bio': forms.Textarea(attrs={'rows': 3}),
-            'company_description': forms.Textarea(attrs={'rows': 3}),
+            'bio': forms.Textarea(attrs={
+                'rows': 4, 'class': 'form-control',
+                'placeholder': 'Tell employers a little about yourself, your experience and what you bring to the table...'
+            }),
+            'location': forms.TextInput(attrs={
+                'class': 'form-control', 'placeholder': 'e.g. Shoreditch, London'
+            }),
+            'phone': forms.TextInput(attrs={
+                'class': 'form-control', 'placeholder': '+44 7xxx xxxxxx'
+            }),
+            'profile_picture': forms.FileInput(attrs={'class': 'form-control'}),
+            'cv': forms.FileInput(attrs={'class': 'form-control'}),
+            'skills': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'e.g. Python, Communication, Teamwork (comma separated)'
+            }),
+            'availability': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'e.g. Weekdays, evenings, weekends'
+            }),
+            'company_name': forms.TextInput(attrs={
+                'class': 'form-control', 'placeholder': 'Your company or trading name'
+            }),
+            'company_description': forms.Textarea(attrs={
+                'rows': 4, 'class': 'form-control',
+                'placeholder': 'Describe what your company does and what makes it a great place to work...'
+            }),
+            'website': forms.URLInput(attrs={
+                'class': 'form-control', 'placeholder': 'https://yourcompany.com'
+            }),
         }
 
     def __init__(self, *args, **kwargs):
@@ -65,6 +160,9 @@ class RatingForm(forms.ModelForm):
         model = Rating
         fields = ['score', 'comment']
         widgets = {
-            'score': forms.NumberInput(attrs={'min': 1, 'max': 5}),
-            'comment': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Leave a comment about your experience...'}),
+            'score': forms.NumberInput(attrs={'min': 1, 'max': 5, 'class': 'form-control'}),
+            'comment': forms.Textarea(attrs={
+                'rows': 3, 'class': 'form-control',
+                'placeholder': 'Share your experience working with this person...'
+            }),
         }

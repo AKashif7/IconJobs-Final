@@ -1,60 +1,84 @@
 {% extends 'base.html' %}
 {% block title %}{% if editing %}Edit Job{% else %}Post a Job{% endif %} — IconJobs{% endblock %}
 {% block content %}
-<div class="container py-4" style="max-width:720px">
-  <a href="/employer/dashboard/" style="font-size:0.875rem;color:var(--amber-dark);font-weight:600;text-decoration:none"><i class="bi bi-arrow-left me-1"></i>Back to Dashboard</a>
-  <div class="card mt-3 p-4">
-    <h2 style="font-family:'Syne',sans-serif;font-weight:800;margin-bottom:0.25rem">
-      {% if editing %}Edit Job Posting{% else %}Post a New Job{% endif %}
-    </h2>
-    <p style="color:var(--slate-light);font-size:0.875rem;margin-bottom:1.5rem">Fill in the details below. Your job will appear to job seekers immediately.</p>
+<div class="container py-5" style="max-width:740px">
 
-    <form method="POST">
+  <a href="/employer/dashboard/" style="font-size:0.85rem;color:var(--amber-dark);font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:4px;margin-bottom:1.5rem">
+    <i class="bi bi-arrow-left"></i> Back to Dashboard
+  </a>
+
+  <div class="card" style="padding:2rem 2.25rem">
+    <div style="margin-bottom:2rem">
+      <h2 style="font-weight:800;font-size:1.6rem;letter-spacing:-0.03em;margin-bottom:0.3rem">
+        {% if editing %}Edit Job Posting{% else %}Post a New Job{% endif %}
+      </h2>
+      <p style="color:var(--slate-light);font-size:0.875rem">
+        Complete all fields for the best results. Jobs with full descriptions attract significantly more qualified applicants.
+      </p>
+    </div>
+
+    <form method="POST" novalidate>
       {% csrf_token %}
-      <div class="row g-3">
+
+      <!-- JOB BASICS -->
+      <p class="form-section-label">Job Details</p>
+      <div class="row g-3 mb-4">
         <div class="col-12">
-          <label class="form-label">Job Title *</label>
+          <label class="form-label">Job Title <span style="color:var(--danger)">*</span></label>
           {{ form.title }}
-          {% if form.title.errors %}<div class="text-danger" style="font-size:0.8rem">{{ form.title.errors }}</div>{% endif %}
+          <div class="form-text">Use a clear, searchable title — e.g. "Warehouse Operative" not "Team Member"</div>
+          {% if form.title.errors %}<div class="form-text text-danger">{{ form.title.errors.0 }}</div>{% endif %}
         </div>
         <div class="col-md-6">
           <label class="form-label">Category</label>
           {{ form.category }}
         </div>
         <div class="col-md-6">
-          <label class="form-label">Location *</label>
+          <label class="form-label">Location <span style="color:var(--danger)">*</span></label>
           {{ form.location }}
         </div>
+      </div>
+
+      <!-- DURATION & PAY -->
+      <div style="height:1px;background:var(--border);margin-bottom:1.5rem"></div>
+      <p class="form-section-label">Schedule & Pay</p>
+      <div class="row g-3 mb-4">
         <div class="col-md-4">
-          <label class="form-label">Duration *</label>
+          <label class="form-label">Duration <span style="color:var(--danger)">*</span></label>
           {{ form.duration }}
         </div>
         <div class="col-md-4">
-          <label class="form-label">Pay Rate (£) *</label>
+          <label class="form-label">Pay Rate (£) <span style="color:var(--danger)">*</span></label>
           {{ form.pay_rate }}
         </div>
         <div class="col-md-4">
-          <label class="form-label">Pay Type *</label>
+          <label class="form-label">Pay Type <span style="color:var(--danger)">*</span></label>
           {{ form.pay_type }}
         </div>
         <div class="col-md-6">
           <label class="form-label">Spots Available</label>
           {{ form.spots_available }}
+          <div class="form-text">How many people are you hiring?</div>
         </div>
         <div class="col-md-6">
-          <label class="form-label">Start Date *</label>
+          <label class="form-label">Start Date <span style="color:var(--danger)">*</span></label>
           {{ form.start_date }}
-        </div>
-        <div class="col-12">
-          <label class="form-label">Job Description *</label>
-          {{ form.description }}
-          {% if form.description.errors %}<div class="text-danger" style="font-size:0.8rem">{{ form.description.errors }}</div>{% endif %}
         </div>
       </div>
 
-      <div class="d-flex gap-2 mt-4">
+      <!-- DESCRIPTION -->
+      <div style="height:1px;background:var(--border);margin-bottom:1.5rem"></div>
+      <p class="form-section-label">Job Description</p>
+      <div class="mb-5">
+        <label class="form-label">Full Description <span style="color:var(--danger)">*</span></label>
+        {{ form.description }}
+        <div class="form-text">Include: responsibilities, requirements, dress code, what to bring, anything candidates should know before accepting.</div>
+        {% if form.description.errors %}<div class="form-text text-danger">{{ form.description.errors.0 }}</div>{% endif %}
+      </div>
+
+      <div class="d-flex gap-3">
         <button type="submit" class="btn btn-amber btn-lg flex-grow-1">
-          {% if editing %}<i class="bi bi-check-lg me-1"></i>Save Changes{% else %}<i class="bi bi-plus me-1"></i>Post Job{% endif %}
+          {% if editing %}<i class="bi bi-check-lg me-1"></i>Save Changes{% else %}<i class="bi bi-plus me-1"></i>Publish Job{% endif %}
         </button>
         <a href="/employer/dashboard/" class="btn btn-outline-ink btn-lg">Cancel</a>
       </div>

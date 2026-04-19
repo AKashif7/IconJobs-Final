@@ -1,52 +1,147 @@
 {% extends 'base.html' %}
 {% block title %}Create Account — IconJobs{% endblock %}
 {% block content %}
-<div class="container py-5" style="max-width:520px">
-  <div class="text-center mb-4">
-    <h1 style="font-family:'Syne',sans-serif;font-weight:800;font-size:2rem">Join IconJobs</h1>
-    <p style="color:var(--slate-light)">Find local micro jobs or hire talent fast</p>
+<div class="container py-5" style="max-width:560px">
+
+  <div class="text-center mb-5">
+    <div style="font-size:2.5rem;margin-bottom:0.5rem">🏅</div>
+    <h1 style="font-weight:800;font-size:2rem;letter-spacing:-0.03em">Join IconJobs</h1>
+    <p style="color:var(--slate-light);margin-top:0.4rem;font-size:0.95rem">Find local micro jobs or hire great talent — it's free.</p>
   </div>
-  <div class="card p-4">
-    <form method="POST">
+
+  {% if form.non_field_errors %}
+  <div class="alert alert-danger mb-4">{{ form.non_field_errors }}</div>
+  {% endif %}
+
+  <div class="card" style="padding:2rem 2.25rem">
+
+    <form method="POST" novalidate>
       {% csrf_token %}
-      <div class="row g-3">
+
+      <!-- PERSONAL INFO -->
+      <p class="form-section-label" style="margin-bottom:1rem">Personal Information</p>
+
+      <div class="row g-3 mb-3">
         <div class="col-md-6">
-          <label class="form-label">First Name *</label>
+          <label class="form-label" for="{{ form.first_name.id_for_label }}">First Name <span style="color:var(--danger)">*</span></label>
           {{ form.first_name }}
+          {% if form.first_name.errors %}
+          <div class="form-text text-danger">{{ form.first_name.errors.0 }}</div>
+          {% endif %}
         </div>
         <div class="col-md-6">
-          <label class="form-label">Last Name *</label>
+          <label class="form-label" for="{{ form.last_name.id_for_label }}">Last Name <span style="color:var(--danger)">*</span></label>
           {{ form.last_name }}
-        </div>
-        <div class="col-12">
-          <label class="form-label">Username *</label>
-          {{ form.username }}
-          {% if form.username.errors %}<div class="text-danger" style="font-size:0.8rem">{{ form.username.errors }}</div>{% endif %}
-        </div>
-        <div class="col-12">
-          <label class="form-label">Email *</label>
-          {{ form.email }}
-        </div>
-        <div class="col-12">
-          <label class="form-label">I am joining as *</label>
-          {{ form.role }}
-        </div>
-        <div class="col-12">
-          <label class="form-label">Password *</label>
-          {{ form.password1 }}
-          {% if form.password1.errors %}<div class="text-danger" style="font-size:0.8rem">{{ form.password1.errors }}</div>{% endif %}
-        </div>
-        <div class="col-12">
-          <label class="form-label">Confirm Password *</label>
-          {{ form.password2 }}
-          {% if form.password2.errors %}<div class="text-danger" style="font-size:0.8rem">{{ form.password2.errors }}</div>{% endif %}
+          {% if form.last_name.errors %}
+          <div class="form-text text-danger">{{ form.last_name.errors.0 }}</div>
+          {% endif %}
         </div>
       </div>
-      <button type="submit" class="btn btn-amber w-100 btn-lg mt-4">Create Account <i class="bi bi-arrow-right ms-1"></i></button>
+
+      <div class="mb-3">
+        <label class="form-label" for="{{ form.email.id_for_label }}">Email Address <span style="color:var(--danger)">*</span></label>
+        {{ form.email }}
+        {% if form.email.errors %}
+        <div class="form-text text-danger">{{ form.email.errors.0 }}</div>
+        {% endif %}
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label" for="{{ form.username.id_for_label }}">Username <span style="color:var(--danger)">*</span></label>
+        {{ form.username }}
+        <div class="form-text">This will be your public profile URL. Letters, numbers and underscores only.</div>
+        {% if form.username.errors %}
+        <div class="form-text text-danger">{{ form.username.errors.0 }}</div>
+        {% endif %}
+      </div>
+
+      <!-- ACCOUNT TYPE -->
+      <div style="height:1px;background:var(--border);margin-bottom:1.5rem"></div>
+      <p class="form-section-label" style="margin-bottom:1rem">Account Type</p>
+
+      <div class="mb-4">
+        <label class="form-label" for="{{ form.role.id_for_label }}">I am joining as <span style="color:var(--danger)">*</span></label>
+        {{ form.role }}
+        <div class="form-text">Choose <strong>Job Seeker</strong> to find work, or <strong>Employer</strong> to post jobs and hire.</div>
+      </div>
+
+      <!-- PASSWORD -->
+      <div style="height:1px;background:var(--border);margin-bottom:1.5rem"></div>
+      <p class="form-section-label" style="margin-bottom:1rem">Set a Password</p>
+
+      <div class="mb-3">
+        <label class="form-label" for="{{ form.password1.id_for_label }}">Password <span style="color:var(--danger)">*</span></label>
+        {{ form.password1 }}
+        <div class="form-text">Minimum 8 characters. Cannot be entirely numeric.</div>
+        {% if form.password1.errors %}
+        <div class="form-text text-danger">{{ form.password1.errors.0 }}</div>
+        {% endif %}
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label" for="{{ form.password2.id_for_label }}">Confirm Password <span style="color:var(--danger)">*</span></label>
+        {{ form.password2 }}
+        {% if form.password2.errors %}
+        <div class="form-text text-danger">{{ form.password2.errors.0 }}</div>
+        {% endif %}
+      </div>
+
+      <!-- TERMS & CONDITIONS -->
+      <div style="height:1px;background:var(--border);margin-bottom:1.5rem"></div>
+      <p class="form-section-label" style="margin-bottom:1rem">Terms & Conditions</p>
+
+      <div class="terms-box mb-4">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="agree_terms" id="agree_terms" required>
+          <label class="form-check-label" for="agree_terms" style="font-size:0.875rem;color:var(--slate)">
+            <strong>Please accept terms and conditions to make an account.</strong>
+            I agree to the IconJobs Terms of Service and Privacy Policy. I understand how my data will be used and stored.
+          </label>
+          {% if form.agree_terms.errors %}
+          <div class="form-text text-danger mt-1">{{ form.agree_terms.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-check mt-3 pt-3" style="border-top:1px solid var(--border)">
+          <input class="form-check-input" type="checkbox" name="agree_authentic" id="agree_authentic" required>
+          <label class="form-check-label" for="agree_authentic" style="font-size:0.875rem;color:var(--slate)">
+            <strong>My profile is 100% authentic, and I understand that anything given false about me will result in UK law enforcement.</strong>
+            I confirm all information I provide is truthful and accurate. Misrepresentation may result in account termination and referral to UK authorities.
+          </label>
+          {% if form.agree_authentic.errors %}
+          <div class="form-text text-danger mt-1">{{ form.agree_authentic.errors.0 }}</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-amber btn-lg w-100" id="registerBtn" onclick="return validateTerms()">
+        Create My Account <i class="bi bi-arrow-right ms-1"></i>
+      </button>
     </form>
-    <p class="text-center mt-3" style="font-size:0.875rem;color:var(--slate-light)">
-      Already have an account? <a href="/accounts/login/" style="color:var(--amber-dark);font-weight:600">Sign in</a>
+
+    <p class="text-center mt-4" style="font-size:0.875rem;color:var(--slate-light)">
+      Already have an account? <a href="/accounts/login/" style="color:var(--amber-dark);font-weight:700">Sign in</a>
     </p>
   </div>
 </div>
+
+{% block extra_js %}
+<script>
+function validateTerms() {
+    const terms    = document.getElementById('agree_terms');
+    const authentic = document.getElementById('agree_authentic');
+    if (!terms.checked) {
+        terms.focus();
+        alert('Please accept the Terms & Conditions to continue.');
+        return false;
+    }
+    if (!authentic.checked) {
+        authentic.focus();
+        alert('Please confirm your profile is 100% authentic to continue.');
+        return false;
+    }
+    return true;
+}
+</script>
+{% endblock %}
 {% endblock %}
