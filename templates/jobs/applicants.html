@@ -151,17 +151,20 @@
             </form>
 
             {% elif app.status == 'accepted' %}
-            {% if app.conversation %}
-            <a href="/chat/inbox/{{ app.conversation.pk }}/" class="btn btn-primary btn-sm w-100">
-              <i class="bi bi-chat-dots me-1"></i>Open Chat
-            </a>
-            {% endif %}
             <form method="POST" action="/employer/applications/{{ app.pk }}/update/">
               {% csrf_token %}
               <button name="action" value="complete" class="btn btn-sm w-100" style="background:#d4f0e3;color:#1a6640;border:none">
                 <i class="bi bi-award me-1"></i>Mark Complete
               </button>
             </form>
+            <a href="/accounts/profile/{{ app.applicant.username }}/" class="btn btn-sm btn-outline-ink w-100">
+              <i class="bi bi-person me-1"></i>Full Profile
+            </a>
+            {% if app.conversation %}
+            <a href="/chat/inbox/{{ app.conversation.pk }}/" class="btn btn-sm w-100" style="background:var(--ink);color:#fff">
+              <i class="bi bi-chat-dots me-1"></i>Open Chat
+            </a>
+            {% endif %}
 
             {% elif app.status == 'completed' %}
             <div class="text-center" style="font-size:0.8rem;color:var(--success)">
@@ -177,9 +180,11 @@
             </div>
             {% endif %}
 
-            <a href="/accounts/profile/{{ app.applicant.username }}/" class="btn btn-sm btn-outline-ink">
+            {% if app.status != 'accepted' %}
+            <a href="/accounts/profile/{{ app.applicant.username }}/" class="btn btn-sm btn-outline-ink w-100">
               <i class="bi bi-person me-1"></i>Full Profile
             </a>
+            {% endif %}
           </div>
         </div>
 

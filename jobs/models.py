@@ -103,6 +103,14 @@ class Application(models.Model):
     def __str__(self):
         return f"{self.applicant.username} → {self.job.title} [{self.status}]"
 
+    @property
+    def conversation(self):
+        from chat.models import Conversation
+        return Conversation.objects.filter(
+            job=self.job,
+            participants=self.applicant,
+        ).first()
+
 
 class ApplicationDocument(models.Model):
     """Documents uploaded with job application (CV, cover letter, etc.)"""
