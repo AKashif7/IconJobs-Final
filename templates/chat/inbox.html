@@ -11,7 +11,7 @@
 {% block content %}
 <div class="chat-layout {% if active_conv %}has-active{% else %}no-active{% endif %}">
 
-    <!-- ═══════════════ LEFT SIDEBAR ═══════════════ -->
+    <!-- ═══ SIDEBAR ═══ -->
     <aside class="chat-sidebar">
         <div class="chat-sidebar-header">
             <div class="d-flex align-items-center justify-content-between mb-1">
@@ -22,7 +22,7 @@
                 </span>
                 {% endif %}
             </div>
-            <p style="font-size:0.73rem;color:var(--slate-light);margin:0">Accepted job conversations</p>
+            <p style="font-size:0.73rem;color:var(--slate-light);margin:0">Your conversations</p>
         </div>
 
         <div class="chat-sidebar-list">
@@ -46,16 +46,20 @@
                                 {% if conv.last_message.sender == request.user %}You: {% endif %}
                                 {{ conv.last_message.content|truncatechars:42 }}
                             {% else %}
-                                <em style="font-style:italic;opacity:0.6">No messages yet</em>
+                                <em style="opacity:0.6">No messages yet</em>
                             {% endif %}
                         </div>
+                        {% with app=conv.application %}
+                        {% if app and app.job %}
                         <div style="font-size:0.68rem;color:var(--amber-dark);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
-                            {{ conv.application.job.title|truncatechars:36 }}
+                            {{ app.job.title|truncatechars:36 }}
                         </div>
+                        {% endif %}
+                        {% endwith %}
                     </div>
                     <div class="conv-item-right">
                         <span class="conv-item-time">
-                            {% if conv.last_message %}{{ conv.last_message.created_at|date:"d M" }}{% endif %}
+                            {% if conv.last_message %}{{ conv.last_message.sent_at|date:"d M" }}{% endif %}
                         </span>
                         {% if unread > 0 %}
                         <span class="conv-unread-pill">{{ unread }}</span>
@@ -74,18 +78,16 @@
         </div>
     </aside>
 
-    <!-- ═══════════════ RIGHT MAIN PANEL ═══════════════ -->
+    <!-- ═══ MAIN PANEL ═══ -->
     <main class="chat-main">
         {% if active_conv %}
-        {% with app=active_conv.application %}
 
+            <!-- Header -->
             <div class="chat-main-header">
-                <a href="/chat/inbox/" class="d-md-none" style="color:var(--ink);margin-right:0.5rem">
+                <a href="/chat/inbox/" class="d-md-none me-2" style="color:var(--ink)">
                     <i class="bi bi-arrow-left" style="font-size:1.1rem"></i>
                 </a>
-                <div class="online-wrap" style="cursor:pointer;flex-shrink:0"
-                     ondblclick="window.location='/accounts/profile/{{ active_other.username }}/'"
-                     title="Double-click to view full profile">
+                <div class="online-wrap" style="flex-shrink:0">
                     {% if active_other_profile and active_other_profile.profile_picture %}
                         <img src="{{ active_other_profile.profile_picture.url }}" class="avatar-img" alt="">
                     {% else %}
@@ -103,31 +105,34 @@
                         {% endif %}
                     </div>
                     {% if active_other_profile %}
-                    {% with r=active_other_profile.average_rating %}
-                    {% if r %}
-                    <div style="font-size:0.72rem;color:var(--slate-light);display:flex;align-items:center;gap:4px">
-                        <i class="bi bi-star-fill" style="color:var(--amber);font-size:0.68rem"></i>
-                        <strong style="color:var(--ink)">{{ r }}</strong>
-                        <span>({{ active_other_profile.ratings_received.count }} review{{ active_other_profile.ratings_received.count|pluralize }})</span>
-                        &bull;
-                        <span>{{ active_other_profile.jobs_completed }} job{{ active_other_profile.jobs_completed|pluralize }} completed</span>
-                    </div>
-                    {% endif %}
-                    {% endwith %}
+                        {% with r=active_other_profile.average_rating %}
+                        {% if r %}
+                        <div style="font-size:0.72rem;color:var(--slate-light);display:flex;align-items:center;gap:4px">
+                            <i class="bi bi-star-fill" style="color:var(--amber);font-size:0.68rem"></i>
+                            <strong style="color:var(--ink)">{{ r }}</strong>
+                            <span>({{ active_other_profile.ratings_received.count }} review{{ active_other_profile.ratings_received.count|pluralize }})</span>
+                            &bull;
+                            <span>{{ active_other_profile.jobs_completed }} job{{ active_other_profile.jobs_completed|pluralize }} completed</span>
+                        </div>
+                        {% endif %}
+                        {% endwith %}
                     {% endif %}
                     <div class="chat-main-status" id="headerOnlineText">
                         <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--border);margin-right:4px"></span>
-                        <span class="offline-text">Checking...</span>
+                        <span class="offline-text">Offline</span>
                     </div>
                 </div>
-                <div class="d-flex gap-2 align-items-center">
+                <div class="d-flex gap-2 align-items-center flex-shrink-0">
                     <a href="/accounts/profile/{{ active_other.username }}/" class="btn btn-outline-ink btn-sm">
                         <i class="bi bi-person me-1"></i>Profile
                     </a>
+                    {% if app %}
                     <span class="status-badge status-{{ app.status }}">{{ app.get_status_display }}</span>
+                    {% endif %}
                 </div>
             </div>
 
+            <!-- Contact banner (unlocked after acceptance) -->
             {% if show_contact and active_other_profile %}
             <div class="contact-banner">
                 <i class="bi bi-unlock-fill" style="color:var(--amber-dark);font-size:0.9rem"></i>
@@ -142,18 +147,13 @@
             </div>
             {% endif %}
 
+            <!-- Messages -->
             <div class="chat-messages" id="chatMessages">
                 {% for msg in active_messages %}
-                    {% if msg.is_system %}
-                        <div class="d-flex justify-content-center">
-                            <div class="chat-bubble system-msg">
-                                <i class="bi bi-info-circle me-1"></i>{{ msg.content }}
-                            </div>
-                        </div>
-                    {% elif msg.sender == request.user %}
+                    {% if msg.sender == request.user %}
                         <div class="d-flex flex-column align-items-end">
                             <div class="chat-bubble mine">{{ msg.content }}</div>
-                            <div class="chat-time mine-time">{{ msg.created_at|date:"d M, H:i" }}</div>
+                            <div class="chat-time mine-time">{{ msg.sent_at|date:"d M, H:i" }}</div>
                         </div>
                     {% else %}
                         <div class="d-flex align-items-end gap-2">
@@ -167,7 +167,7 @@
                             {% endif %}
                             <div>
                                 <div class="chat-bubble theirs">{{ msg.content }}</div>
-                                <div class="chat-time">{{ msg.created_at|date:"d M, H:i" }}</div>
+                                <div class="chat-time">{{ msg.sent_at|date:"d M, H:i" }}</div>
                             </div>
                         </div>
                     {% endif %}
@@ -179,19 +179,20 @@
                 {% endfor %}
             </div>
 
+            <!-- Input -->
             <div class="chat-input-area">
                 <div class="quick-btns">
                     <span style="font-size:0.7rem;color:var(--slate-light);align-self:center;flex-shrink:0;font-weight:600">Quick:</span>
                     {% if is_employer %}
-                    <button class="quick-btn" onclick="insertQuick('Please arrive at 9:00 AM.')">📍 Arrival time</button>
-                    <button class="quick-btn" onclick="insertQuick('Please wear smart casual clothing.')">👔 Dress code</button>
-                    <button class="quick-btn" onclick="insertQuick('The full address is: ')">📌 Full address</button>
-                    <button class="quick-btn" onclick="insertQuick('Looking forward to seeing you. Let me know if you have any questions.')">👋 Welcome</button>
+                    <button class="quick-btn" onclick="insertQuick('Please arrive at 9:00 AM.')">&#128205; Arrival time</button>
+                    <button class="quick-btn" onclick="insertQuick('Please wear smart casual clothing.')">&#128084; Dress code</button>
+                    <button class="quick-btn" onclick="insertQuick('The full address is: ')">&#128204; Full address</button>
+                    <button class="quick-btn" onclick="insertQuick('Looking forward to seeing you. Let me know if you have any questions.')">&#128075; Welcome</button>
                     {% else %}
-                    <button class="quick-btn" onclick="insertQuick('Thank you for accepting me! Really looking forward to it.')">👋 Thanks</button>
-                    <button class="quick-btn" onclick="insertQuick('Could you confirm the exact address please?')">📍 Ask address</button>
-                    <button class="quick-btn" onclick="insertQuick('What time should I arrive?')">🕐 Ask time</button>
-                    <button class="quick-btn" onclick="insertQuick('Is there anything specific I should bring?')">🎒 What to bring</button>
+                    <button class="quick-btn" onclick="insertQuick('Thank you for accepting me! Really looking forward to it.')">&#128075; Thanks</button>
+                    <button class="quick-btn" onclick="insertQuick('Could you confirm the exact address please?')">&#128205; Ask address</button>
+                    <button class="quick-btn" onclick="insertQuick('What time should I arrive?')">&#128336; Ask time</button>
+                    <button class="quick-btn" onclick="insertQuick('Is there anything specific I should bring?')">&#127890; What to bring</button>
                     {% endif %}
                 </div>
                 <form method="POST" action="/chat/inbox/{{ active_conv.pk }}/" class="d-flex gap-2">
@@ -204,7 +205,6 @@
                 </form>
             </div>
 
-        {% endwith %}
         {% else %}
             <div class="chat-empty">
                 <i class="bi bi-chat-square-dots" style="font-size:4rem;opacity:0.12"></i>
@@ -234,14 +234,16 @@ function formatLastSeen(isoStr) {
     const d = new Date(isoStr);
     const s = Math.floor((new Date() - d) / 1000);
     if (s < 60)    return 'Last seen just now';
-    if (s < 3600)  return 'Last seen ' + Math.floor(s/60) + 'm ago';
-    if (s < 86400) return 'Last seen ' + Math.floor(s/3600) + 'h ago';
-    return 'Last seen ' + d.toLocaleDateString('en-GB', {day:'numeric', month:'short'});
+    if (s < 3600)  return 'Last seen ' + Math.floor(s / 60) + 'm ago';
+    if (s < 86400) return 'Last seen ' + Math.floor(s / 3600) + 'h ago';
+    return 'Last seen ' + d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 }
+
 function setDotOnline(dot, online) {
     if (!dot) return;
     dot.className = online ? 'online-dot' : 'offline-dot';
 }
+
 function updateHeaderStatus(online, lastSeen) {
     const wrap = document.getElementById('headerOnlineText');
     if (!wrap) return;
@@ -269,6 +271,7 @@ function pollOnline() {
             }).catch(() => {});
     });
 }
+
 if (uids.size > 0) { pollOnline(); setInterval(pollOnline, 20000); }
 </script>
 {% endblock %}

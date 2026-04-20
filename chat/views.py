@@ -12,7 +12,6 @@ from jobs.models import Job
 
 @login_required
 def inbox(request, conversation_id=None):
-    """Main inbox — sidebar list + optional active conversation panel."""
     all_convs = request.user.conversations.all().prefetch_related('participants', 'messages')
 
     conv_data = []
@@ -43,14 +42,13 @@ def inbox(request, conversation_id=None):
         if not active_conv.participants.filter(id=request.user.id).exists():
             return redirect('inbox')
 
-        # Handle POST (send message via form submit)
         if request.method == 'POST':
             content = request.POST.get('content', '').strip()
             if content:
                 Message.objects.create(
                     conversation=active_conv,
                     sender=request.user,
-                    content=content
+                    content=content,
                 )
                 active_conv.save(update_fields=['last_message_at'])
             return redirect('inbox_conversation', conversation_id=conversation_id)
@@ -61,7 +59,6 @@ def inbox(request, conversation_id=None):
         except Exception:
             active_other_profile = None
 
-        # Mark incoming messages as read
         active_conv.messages.filter(read_at__isnull=True).exclude(
             sender=request.user
         ).update(read_at=timezone.now())
@@ -85,6 +82,7 @@ def inbox(request, conversation_id=None):
             'active_messages': active_messages,
             'is_employer': is_employer,
             'show_contact': show_contact,
+            'app': app,
         })
 
     return render(request, 'chat/inbox.html', context)
@@ -108,15 +106,16 @@ def conversation_detail(request, conversation_id):
             Message.objects.create(
                 conversation=conversation,
                 sender=request.user,
-                content=content
+                content=content,
             )
             conversation.save(update_fields=['last_message_at'])
         return redirect('conversation_detail', conversation_id=conversation_id)
 
-    messages = conversation.messages.all()
     conversation.messages.filter(read_at__isnull=True).exclude(
         sender=request.user
     ).update(read_at=timezone.now())
+
+    msgs = conversation.messages.all()
 
     try:
         is_employer = request.user.profile.role == 'employer'
@@ -132,7 +131,7 @@ def conversation_detail(request, conversation_id):
         'conversation': conversation,
         'other_user': other_user,
         'other_profile': other_profile,
-        'messages': messages,
+        'messages': msgs,
         'application': app,
         'job': conversation.job,
         'show_contact': show_contact,
@@ -159,7 +158,7 @@ def send_message(request):
         message = Message.objects.create(
             conversation=conversation,
             sender=request.user,
-            content=content
+            content=content,
         )
         conversation.save(update_fields=['last_message_at'])
         TypingIndicator.objects.filter(conversation=conversation, user=request.user).delete()
@@ -183,26 +182,28 @@ def mark_message_read(request):
         message_id = data.get('message_id')
         message = get_object_or_404(Message, id=message_id)
         if message.sender == request.user:
-            return JsonResponse({'success': False, 'error': 'Cannot mark your own message as read'}, status=400)
+            return JsonResponse({'success': False, 'error': 'Cannot mark own message as read'}, status=400)
         message.read_at = timezone.now()
         message.save(update_fields=['read_at'])
-        return JsonResponse({'success': True, 'message_id': message.id, 'read_at': message.read_at.isoformat()})
+        return JsonResponse({'success': True, 'message_id': message.id})
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
 
 
 @login_required
 @require_http_methods(["POST"])
-def set_typing_indicator(request):
+def set_typing_indicator(request, conversation_id):
     try:
         data = json.loads(request.body)
-        conversation_id = data.get('conversation_id')
         is_typing = data.get('is_typing', True)
         conversation = get_object_or_404(Conversation, id=conversation_id)
         if not conversation.participants.filter(id=request.user.id).exists():
             return JsonResponse({'success': False, 'error': 'Not a participant'}, status=403)
         if is_typing:
-            TypingIndicator.objects.update_or_create(conversation=conversation, user=request.user)
+            TypingIndicator.objects.update_or_create(
+                conversation=conversation, user=request.user,
+                defaults={'started_at': timezone.now()},
+            )
         else:
             TypingIndicator.objects.filter(conversation=conversation, user=request.user).delete()
         return JsonResponse({'success': True})
@@ -217,10 +218,12 @@ def get_typing_indicators(request, conversation_id):
         conversation = get_object_or_404(Conversation, id=conversation_id)
         if not conversation.participants.filter(id=request.user.id).exists():
             return JsonResponse({'success': False, 'error': 'Not a participant'}, status=403)
-        typing_users = TypingIndicator.objects.filter(
-            conversation=conversation
-        ).exclude(user=request.user).values_list('user__username', flat=True)
-        return JsonResponse({'success': True, 'typing_users': list(typing_users)})
+        typing_users = list(
+            TypingIndicator.objects.filter(conversation=conversation)
+            .exclude(user=request.user)
+            .values_list('user__username', flat=True)
+        )
+        return JsonResponse({'success': True, 'typing_users': typing_users})
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
 
@@ -236,14 +239,24 @@ def start_conversation(request):
         other_user = get_object_or_404(User, id=other_user_id)
         job = get_object_or_404(Job, id=job_id) if job_id else None
 
-        conversation, created = Conversation.objects.get_or_create(job=job)
-        conversation.participants.add(request.user, other_user)
+        # Find an existing conversation between exactly these two users
+        qs = Conversation.objects.filter(participants=request.user).filter(participants=other_user)
+        if job:
+            qs = qs.filter(job=job)
+
+        if qs.exists():
+            conversation = qs.first()
+            created = False
+        else:
+            conversation = Conversation.objects.create(job=job)
+            conversation.participants.add(request.user, other_user)
+            created = True
 
         return JsonResponse({
             'success': True,
             'conversation_id': conversation.id,
             'created': created,
-            'url': f'/chat/inbox/{conversation.id}/'
+            'url': f'/chat/inbox/{conversation.id}/',
         })
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
@@ -254,7 +267,7 @@ def start_conversation(request):
 def get_unread_count(request):
     count = Message.objects.filter(
         conversation__participants=request.user,
-        read_at__isnull=True
+        read_at__isnull=True,
     ).exclude(sender=request.user).count()
     return JsonResponse({'unread': count})
 
@@ -279,19 +292,21 @@ def get_conversation_messages(request, conversation_id):
         if not conversation.participants.filter(id=request.user.id).exists():
             return JsonResponse({'success': False, 'error': 'Not a participant'}, status=403)
 
-        messages = conversation.messages.all()
-        messages_data = [{
-            'id': msg.id,
-            'sender_id': msg.sender.id,
-            'sender_username': msg.sender.username,
-            'sender_name': msg.sender.first_name or msg.sender.username,
-            'content': msg.content,
-            'sent_at': msg.sent_at.isoformat(),
-            'is_read': msg.is_read,
-            'read_at': msg.read_at.isoformat() if msg.read_at else None,
-            'is_own_message': msg.sender == request.user
-        } for msg in messages]
+        messages_data = [
+            {
+                'id': msg.id,
+                'sender_id': msg.sender.id,
+                'sender_username': msg.sender.username,
+                'sender_name': msg.sender.first_name or msg.sender.username,
+                'content': msg.content,
+                'sent_at': msg.sent_at.isoformat(),
+                'is_read': msg.is_read,
+                'read_at': msg.read_at.isoformat() if msg.read_at else None,
+                'is_own': msg.sender_id == request.user.id,
+            }
+            for msg in conversation.messages.all()
+        ]
 
-        return JsonResponse({'success': True, 'messages': messages_data, 'total': len(messages_data)})
+        return JsonResponse({'success': True, 'messages': messages_data})
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
