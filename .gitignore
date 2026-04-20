@@ -207,3 +207,6 @@ marimo/_lsp/
 __marimo__/
 media/
 staticfiles/
+
+# Claude Code
+.claude/
