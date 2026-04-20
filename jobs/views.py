@@ -228,14 +228,26 @@ def update_application(request, app_pk):
         application.status = 'accepted'
         application.contact_revealed = True
         application.save()
-        # Create a conversation automatically
-        conv, created = Conversation.objects.get_or_create(application=application)
+        # Find or create conversation between employer and applicant for this job
+        qs = Conversation.objects.filter(
+            participants=request.user
+        ).filter(
+            participants=application.applicant
+        ).filter(
+            job=application.job
+        )
+        if qs.exists():
+            conv = qs.first()
+            created = False
+        else:
+            conv = Conversation.objects.create(job=application.job)
+            conv.participants.add(request.user, application.applicant)
+            created = True
         if created:
             Message.objects.create(
                 conversation=conv,
                 sender=request.user,
                 content=f"Hi {application.applicant.first_name or application.applicant.username}, great news — you have been accepted for '{application.job.title}'! Let's coordinate the details.",
-                is_system=False
             )
         messages.success(request, f'{application.applicant.get_full_name() or application.applicant.username} has been accepted! A chat has been opened.')
 
