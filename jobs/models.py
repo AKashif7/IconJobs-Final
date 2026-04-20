@@ -13,6 +13,22 @@ class JobCategory(models.Model):
         verbose_name_plural = 'Job Categories'
 
 
+class JobTitleSynonym(models.Model):
+    """Maps job title synonyms for smart search"""
+    primary_title = models.CharField(max_length=100)
+    synonym = models.CharField(max_length=100)
+    category = models.CharField(max_length=100, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('primary_title', 'synonym')
+        verbose_name_plural = 'Job Title Synonyms'
+        ordering = ['primary_title']
+
+    def __str__(self):
+        return f"{self.primary_title} ↔ {self.synonym}"
+
+
 class Job(models.Model):
     DURATION_CHOICES = [
         ('2h', '2 Hours'),
@@ -86,6 +102,23 @@ class Application(models.Model):
 
     def __str__(self):
         return f"{self.applicant.username} → {self.job.title} [{self.status}]"
+
+
+class ApplicationDocument(models.Model):
+    """Documents uploaded with job application (CV, cover letter, etc.)"""
+    application = models.ForeignKey(Application, on_delete=models.CASCADE, related_name='documents')
+    file = models.FileField(upload_to='applications/%Y/%m/%d/')
+    file_name = models.CharField(max_length=255)
+    file_size_bytes = models.IntegerField()
+    is_from_profile = models.BooleanField(default=False, help_text="True if using existing CV from profile")
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    document_order = models.IntegerField(default=0, help_text="Order of documents in application")
+
+    class Meta:
+        ordering = ['document_order', 'uploaded_at']
+
+    def __str__(self):
+        return f"Document for {self.application.applicant.username}'s application"
 
 
 class SavedJob(models.Model):

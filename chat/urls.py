@@ -2,22 +2,15 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('inbox/', views.inbox, name='inbox'),
-    path('inbox/<int:conv_pk>/', views.inbox, name='inbox_conv'),
-    path('api/unread/', views.unread_count_api, name='unread_count_api'),
-    path('api/online/', views.online_status_api, name='online_status_api'),
+    # Conversation list and detail
+    path('', views.conversations_list, name='conversations_list'),
+    path('<int:conversation_id>/', views.conversation_detail, name='conversation_detail'),
+    
+    # AJAX/API endpoints for messaging
+    path('api/start/', views.start_conversation, name='start_conversation'),
+    path('api/<int:conversation_id>/messages/', views.get_conversation_messages, name='get_conversation_messages'),
+    path('api/message/send/', views.send_message, name='send_message'),
+    path('api/message/read/', views.mark_message_read, name='mark_message_read'),
+    path('api/<int:conversation_id>/typing/', views.set_typing_indicator, name='set_typing_indicator'),
+    path('api/<int:conversation_id>/typing/get/', views.get_typing_indicators, name='get_typing_indicators'),
 ]
-
-from django.views.decorators.http import require_POST as _rp
-from django.contrib.auth.decorators import login_required as _lr
-from django.utils import timezone as _tz
-from django.http import JsonResponse as _jr
-from django.contrib.auth.models import User as _U
-
-@_lr
-def ping_activity(request):
-    """Called by JS to keep last_login fresh while user is active on the page."""
-    _U.objects.filter(pk=request.user.pk).update(last_login=_tz.now())
-    return _jr({'ok': True})
-
-urlpatterns += [path('api/ping/', ping_activity, name='ping_activity')]

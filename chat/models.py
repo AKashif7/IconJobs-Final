@@ -1,42 +1,54 @@
 from django.db import models
 from django.contrib.auth.models import User
-from jobs.models import Application
 
 
 class Conversation(models.Model):
-    application = models.OneToOneField(Application, on_delete=models.CASCADE, related_name='conversation')
+    """Represents a conversation between two users"""
+    participants = models.ManyToManyField(User, related_name='conversations')
+    job = models.ForeignKey('jobs.Job', on_delete=models.SET_NULL, null=True, blank=True,
+                           related_name='conversations', help_text="Optional: link to specific job")
     created_at = models.DateTimeField(auto_now_add=True)
-    employer_last_read = models.DateTimeField(null=True, blank=True)
-    seeker_last_read = models.DateTimeField(null=True, blank=True)
+    last_message_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-last_message_at']
 
     def __str__(self):
-        return f"Chat: {self.application.applicant.username} <-> {self.application.job.employer.username} re: {self.application.job.title}"
+        participant_names = ', '.join([u.username for u in self.participants.all()])
+        return f"Chat: {participant_names}"
 
-    @property
-    def last_message(self):
-        return self.messages.order_by('-created_at').first()
-
-    def unread_count_for(self, user):
-        from django.utils import timezone
-        if user == self.application.job.employer:
-            last_read = self.employer_last_read
-        else:
-            last_read = self.seeker_last_read
-
-        if last_read is None:
-            return self.messages.exclude(sender=user).count()
-        return self.messages.exclude(sender=user).filter(created_at__gt=last_read).count()
+    def get_other_user(self, user):
+        """Get the other participant in a 1-on-1 conversation"""
+        return self.participants.exclude(id=user.id).first()
 
 
 class Message(models.Model):
+    """Individual messages in a conversation"""
     conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name='messages')
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
     content = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    is_system = models.BooleanField(default=False)
+    sent_at = models.DateTimeField(auto_now_add=True)
+    read_at = models.DateTimeField(null=True, blank=True, help_text="When message was read by recipient")
 
     class Meta:
-        ordering = ['created_at']
+        ordering = ['sent_at']
 
     def __str__(self):
         return f"{self.sender.username}: {self.content[:50]}"
+
+    @property
+    def is_read(self):
+        return self.read_at is not None
+
+
+class TypingIndicator(models.Model):
+    """Track who's typing in real-time (temporary, auto-cleaned)"""
+    conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name='typing_indicators')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    started_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ('conversation', 'user')
+
+    def __str__(self):
+        return f"{self.user.username} is typing in {self.conversation}"

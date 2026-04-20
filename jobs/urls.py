@@ -18,4 +18,14 @@ urlpatterns = [
     path('career-guide/', views.career_guide, name='career_guide'),
     path('about/', views.about, name='about'),
     path('contact/', views.contact, name='contact'),
+    path('api/search/suggestions/', views.get_job_title_suggestions, name='job_title_suggestions'),
+    path('api/search/', views.search_jobs, name='search_jobs'),
+    
+    # NEW: Job applications with CV uploads
+    path('<int:job_id>/apply/', views.apply_for_job, name='apply_for_job'),
+    path('my-applications/', views.my_applications, name='my_applications'),
+    path('application/<int:application_id>/', views.application_detail, name='application_detail'),
+    path('employer/applications/', views.job_applications_for_employer, name='employer_applications'),
+    path('api/application/<int:application_id>/status/', views.update_application_status, name='update_application_status'),
+    path('api/application/<int:application_id>/documents/', views.get_application_documents, name='get_application_documents'),
 ]
