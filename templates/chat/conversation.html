@@ -36,7 +36,7 @@
   <!-- Chat window -->
   <div class="card" style="border-radius:var(--radius);overflow:hidden">
     <div class="chat-box" id="chatBox">
-      {% for msg in messages_qs %}
+      {% for msg in messages %}
         {% if msg.is_system %}
           <div class="d-flex justify-content-center">
             <div class="chat-bubble system-msg">

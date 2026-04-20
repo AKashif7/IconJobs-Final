@@ -18,8 +18,23 @@ class Conversation(models.Model):
         return f"Chat: {participant_names}"
 
     def get_other_user(self, user):
-        """Get the other participant in a 1-on-1 conversation"""
         return self.participants.exclude(id=user.id).first()
+
+    @property
+    def last_message(self):
+        return self.messages.last()
+
+    @property
+    def application(self):
+        from jobs.models import Application
+        if not self.job:
+            return None
+        for p in self.participants.all():
+            try:
+                return Application.objects.get(job=self.job, applicant=p)
+            except Application.DoesNotExist:
+                pass
+        return None
 
 
 class Message(models.Model):
@@ -39,6 +54,14 @@ class Message(models.Model):
     @property
     def is_read(self):
         return self.read_at is not None
+
+    @property
+    def created_at(self):
+        return self.sent_at
+
+    @property
+    def is_system(self):
+        return False
 
 
 class TypingIndicator(models.Model):

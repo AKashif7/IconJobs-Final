@@ -1,12 +1,19 @@
 from django.urls import path
+from django.shortcuts import redirect
 from . import views
 
 urlpatterns = [
-    # Conversation list and detail
-    path('', views.conversations_list, name='conversations_list'),
+    # Main inbox (list + active conversation in one view)
+    path('inbox/', views.inbox, name='inbox'),
+    path('inbox/<int:conversation_id>/', views.inbox, name='inbox_conversation'),
+
+    # Redirect bare /chat/ to inbox
+    path('', lambda req: redirect('inbox'), name='conversations_list'),
+
+    # Standalone conversation detail (fallback)
     path('<int:conversation_id>/', views.conversation_detail, name='conversation_detail'),
-    
-    # AJAX/API endpoints for messaging
+
+    # AJAX / API endpoints
     path('api/start/', views.start_conversation, name='start_conversation'),
     path('api/<int:conversation_id>/messages/', views.get_conversation_messages, name='get_conversation_messages'),
     path('api/message/send/', views.send_message, name='send_message'),
@@ -14,5 +21,6 @@ urlpatterns = [
     path('api/<int:conversation_id>/typing/', views.set_typing_indicator, name='set_typing_indicator'),
     path('api/<int:conversation_id>/typing/get/', views.get_typing_indicators, name='get_typing_indicators'),
     path('api/unread/', views.get_unread_count, name='get_unread_count'),
+    path('api/online/', views.get_online_status, name='get_online_status'),
     path('api/ping/', views.ping, name='ping'),
 ]
