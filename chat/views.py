@@ -34,7 +34,7 @@ def conversations_list(request):
         })
 
     context = {'conversations': conv_data}
-    return render(request, 'chat/conversations_list.html', context)
+    return render(request, 'chat/inbox.html', context)
 
 
 @login_required
@@ -65,7 +65,7 @@ def conversation_detail(request, conversation_id):
         'messages': messages,
         'job': conversation.job
     }
-    return render(request, 'chat/conversation_detail.html', context)
+    return render(request, 'chat/conversation.html', context)
 
 
 @login_required
@@ -237,6 +237,22 @@ def start_conversation(request):
 
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
+
+
+@login_required
+@require_http_methods(["GET"])
+def get_unread_count(request):
+    count = Message.objects.filter(
+        conversation__participants=request.user,
+        read_at__isnull=True
+    ).exclude(sender=request.user).count()
+    return JsonResponse({'unread': count})
+
+
+@login_required
+@require_http_methods(["GET"])
+def ping(request):
+    return JsonResponse({'ok': True})
 
 
 @login_required

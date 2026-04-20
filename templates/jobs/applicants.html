@@ -97,9 +97,23 @@
           </div>
           {% endif %}
 
-          {% if app.applicant.profile.cv %}
-          <a href="{{ app.applicant.profile.cv.url }}" target="_blank" class="btn btn-sm btn-outline-ink">
-            <i class="bi bi-file-earmark-pdf me-1"></i>View CV
+          {% if app.documents.all %}
+          <div style="margin-bottom:0.75rem">
+            <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--slate-light);margin-bottom:0.5rem;font-weight:700">
+              <i class="bi bi-paperclip me-1"></i>Uploaded Documents
+            </div>
+            {% for doc in app.documents.all %}
+            <a href="{{ doc.file.url }}" target="_blank"
+               style="display:flex;align-items:center;gap:6px;font-size:0.82rem;color:var(--ink);text-decoration:none;padding:5px 8px;border:1px solid var(--border);border-radius:var(--radius-xs);margin-bottom:4px;background:var(--paper)"
+               title="{{ doc.file_name }}">
+              <i class="bi bi-file-earmark-text" style="color:var(--amber-dark);flex-shrink:0"></i>
+              <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ doc.file_name }}</span>
+            </a>
+            {% endfor %}
+          </div>
+          {% elif app.applicant.profile.cv %}
+          <a href="{{ app.applicant.profile.cv.url }}" target="_blank" class="btn btn-sm btn-outline-ink mb-2">
+            <i class="bi bi-file-earmark-pdf me-1"></i>Profile CV
           </a>
           {% endif %}
 

@@ -30,16 +30,33 @@ def register_view(request):
 def login_view(request):
     if request.user.is_authenticated:
         return redirect('home')
+    
     if request.method == 'POST':
-        form = LoginForm(request, data=request.POST)
-        if form.is_valid():
-            user = form.get_user()
+        username_or_email = request.POST.get('username', '').strip()
+        password = request.POST.get('password', '')
+        
+        # Try to find user by email first, then by username
+        user = None
+        if '@' in username_or_email:
+            # It's an email
+            try:
+                user_obj = User.objects.get(email=username_or_email)
+                user = authenticate(request, username=user_obj.username, password=password)
+            except User.DoesNotExist:
+                pass
+        
+        # If not found by email or no @ sign, try username
+        if user is None:
+            user = authenticate(request, username=username_or_email, password=password)
+        
+        if user is not None:
             login(request, user)
             messages.success(request, f'Welcome back, {user.first_name or user.username}!')
             return redirect(request.GET.get('next', 'home'))
-    else:
-        form = LoginForm()
-    return render(request, 'accounts/login.html', {'form': form})
+        else:
+            messages.error(request, 'Invalid email/username or password.')
+    
+    return render(request, 'accounts/login.html', {})
 
 
 def logout_view(request):
@@ -82,32 +99,98 @@ def profile_view(request, username=None):
             status__in=['accepted', 'completed']
         ).exists()
 
+    # Documents visible to own user, or to an employer who accepted them
+    show_documents = (request.user == target_user) or can_see_contact
+    doc_items = []
+    if show_documents and profile.role == 'jobseeker':
+        docs_dict = {d.document_type: d for d in UserDocument.objects.filter(user=target_user)}
+        for dtype, label in [
+            ('dbs_check', 'DBS Check'),
+            ('national_insurance', 'National Insurance'),
+            ('work_permit_visa', 'Work Permit / Visa'),
+        ]:
+            doc_items.append({'label': label, 'dtype': dtype, 'doc': docs_dict.get(dtype)})
+
     return render(request, 'accounts/profile.html', {
         'profile': profile,
         'target_user': target_user,
         'can_see_contact': can_see_contact,
         'existing_rating': existing_rating,
         'can_rate': can_rate,
+        'doc_items': doc_items,
+        'show_documents': show_documents,
     })
 
 
 @login_required
 def edit_profile(request):
+    from django.contrib.auth import update_session_auth_hash
     profile = get_object_or_404(UserProfile, user=request.user)
+
     if request.method == 'POST':
         form = ProfileEditForm(request.POST, request.FILES, instance=profile)
-        if form.is_valid():
+        password_error = None
+
+        # Handle password change if any password field is filled
+        current_pw = request.POST.get('current_password', '').strip()
+        new_pw1 = request.POST.get('new_password1', '').strip()
+        new_pw2 = request.POST.get('new_password2', '').strip()
+        changing_password = any([current_pw, new_pw1, new_pw2])
+
+        if changing_password:
+            if not current_pw:
+                password_error = 'Please enter your current password.'
+            elif not request.user.check_password(current_pw):
+                password_error = 'Current password is incorrect.'
+            elif not new_pw1:
+                password_error = 'Please enter a new password.'
+            elif len(new_pw1) < 8:
+                password_error = 'New password must be at least 8 characters.'
+            elif new_pw1 != new_pw2:
+                password_error = 'New passwords do not match.'
+
+        if form.is_valid() and not password_error:
             profile_obj = form.save(commit=False)
             request.user.first_name = form.cleaned_data['first_name']
             request.user.last_name = form.cleaned_data['last_name']
             request.user.email = form.cleaned_data['email']
             request.user.save()
             profile_obj.save()
+
+            if changing_password:
+                request.user.set_password(new_pw1)
+                request.user.save()
+                update_session_auth_hash(request, request.user)
+
+            # Save verification documents (job seekers only)
+            if profile.role == 'jobseeker':
+                for doc_type in ['dbs_check', 'national_insurance', 'work_permit_visa']:
+                    file_obj = request.FILES.get(doc_type)
+                    if file_obj:
+                        UserDocument.objects.update_or_create(
+                            user=request.user,
+                            document_type=doc_type,
+                            defaults={
+                                'file': file_obj,
+                                'file_name': file_obj.name,
+                                'file_size_bytes': file_obj.size,
+                                'is_verified': False,
+                            }
+                        )
+
             messages.success(request, 'Profile updated successfully!')
             return redirect('profile')
+        elif password_error:
+            messages.error(request, password_error)
     else:
         form = ProfileEditForm(instance=profile)
-    return render(request, 'accounts/edit_profile.html', {'form': form, 'profile': profile})
+
+    uploaded_docs = {doc.document_type: doc for doc in UserDocument.objects.filter(user=request.user)}
+    return render(request, 'accounts/edit_profile.html', {
+        'form': form,
+        'profile': profile,
+        'uploaded_docs': uploaded_docs,
+    })
 
 
 @login_required

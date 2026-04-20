@@ -24,9 +24,10 @@
       Your profile, star rating, and jobs-completed count will be shared with the employer automatically.
     </p>
 
-    <form method="POST" novalidate>
+    <form method="POST" enctype="multipart/form-data" novalidate>
       {% csrf_token %}
 
+      <!-- Cover Message -->
       <div class="mb-4">
         <label class="form-label">Cover Message</label>
         {{ form.cover_message }}
@@ -36,23 +37,74 @@
         {% endif %}
       </div>
 
-      <div style="background:var(--amber-light);border-radius:var(--radius-sm);padding:1.1rem 1.25rem;margin-bottom:2rem;font-size:0.85rem;border:1px solid rgba(232,160,32,0.25)">
+      <!-- File Uploads -->
+      <div style="height:1px;background:var(--border);margin-bottom:1.5rem"></div>
+      <p class="form-section-label" style="margin-bottom:0.75rem">Supporting Documents</p>
+      <p style="font-size:0.85rem;color:var(--slate-light);margin-bottom:1.25rem">
+        Upload any documents the employer may need — CV, cover letter, portfolio, certificates, etc.
+        You can add as many files as required. Max 10 MB per file.
+      </p>
+
+      <div id="file-list">
+        <div class="file-entry d-flex align-items-center gap-2 mb-2">
+          <input type="file" name="documents" class="form-control" accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg">
+          <button type="button" class="btn btn-sm btn-outline-ink remove-file" style="white-space:nowrap;flex-shrink:0" onclick="removeFile(this)">
+            <i class="bi bi-trash"></i>
+          </button>
+        </div>
+      </div>
+
+      <button type="button" class="btn btn-sm btn-outline-ink mt-1" onclick="addFileInput()">
+        <i class="bi bi-plus-lg me-1"></i>Add another file
+      </button>
+
+      <!-- Info box -->
+      <div style="background:var(--amber-light);border-radius:var(--radius-sm);padding:1.1rem 1.25rem;margin-top:2rem;margin-bottom:2rem;font-size:0.85rem;border:1px solid rgba(232,160,32,0.25)">
         <strong><i class="bi bi-info-circle me-1"></i>What the employer will see:</strong>
         <ul style="margin:0.6rem 0 0;padding-left:1.25rem;line-height:2">
           <li>Your name and profile information</li>
           <li>Your star rating and number of previous jobs completed</li>
-          <li>Your uploaded CV (if you've added one to your profile)</li>
           <li>Your cover message above</li>
+          <li>All files you upload here</li>
         </ul>
         <p style="margin:0.75rem 0 0;color:var(--amber-dark);font-weight:600">
           <i class="bi bi-shield-lock me-1"></i>Contact details (phone, email) are hidden until an employer accepts you.
-             </p>
+        </p>
+      </div>
+
+      <div class="d-flex gap-3">
+        <button type="submit" class="btn btn-amber btn-lg flex-grow-1">
+          Submit Application <i class="bi bi-send ms-1"></i>
+        </button>
+        <a href="/jobs/{{ job.pk }}/" class="btn btn-outline-ink btn-lg">Cancel</a>
+      </div>
+    </form>
   </div>
-    <div class="d-flex gap-3">
-    <button type="submit" class="btn btn-amber btn-lg flex-grow-1">
-      Submit Application <i class="bi bi-send ms-1"></i>
-    </button>
-    <a href="/jobs/{{ job.pk }}/" class="btn btn-outline-ink btn-lg">Cancel</a>
-  </div>
-</form>
-</div> </div> {% endblock %} ```
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function addFileInput() {
+  const list = document.getElementById('file-list');
+  const div = document.createElement('div');
+  div.className = 'file-entry d-flex align-items-center gap-2 mb-2';
+  div.innerHTML = `
+    <input type="file" name="documents" class="form-control" accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg">
+    <button type="button" class="btn btn-sm btn-outline-ink remove-file" style="white-space:nowrap;flex-shrink:0" onclick="removeFile(this)">
+      <i class="bi bi-trash"></i>
+    </button>`;
+  list.appendChild(div);
+}
+
+function removeFile(btn) {
+  const entries = document.querySelectorAll('.file-entry');
+  if (entries.length === 1) {
+    // Clear the input rather than removing the last row
+    btn.closest('.file-entry').querySelector('input[type=file]').value = '';
+    return;
+  }
+  btn.closest('.file-entry').remove();
+}
+</script>
+{% endblock %}

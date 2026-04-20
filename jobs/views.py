@@ -123,6 +123,16 @@ def apply_job(request, pk):
             application.save()
             job.applications_count += 1
             job.save(update_fields=['applications_count'])
+            # Save any uploaded documents
+            for i, f in enumerate(request.FILES.getlist('documents')):
+                if f.size > 0:
+                    ApplicationDocument.objects.create(
+                        application=application,
+                        file=f,
+                        file_name=f.name,
+                        file_size_bytes=f.size,
+                        document_order=i,
+                    )
             messages.success(request, 'Application submitted! The employer will review your profile.')
             return redirect('job_detail', pk=pk)
     else:
@@ -204,7 +214,7 @@ def employer_dashboard(request):
 @login_required
 def view_applicants(request, job_pk):
     job = get_object_or_404(Job, pk=job_pk, employer=request.user)
-    applications = job.applications.select_related('applicant__profile').order_by('-applied_at')
+    applications = job.applications.select_related('applicant__profile').prefetch_related('documents').order_by('-applied_at')
     return render(request, 'jobs/applicants.html', {'job': job, 'applications': applications})
 
 

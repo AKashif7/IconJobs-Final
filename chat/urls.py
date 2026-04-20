@@ -13,4 +13,6 @@ urlpatterns = [
     path('api/message/read/', views.mark_message_read, name='mark_message_read'),
     path('api/<int:conversation_id>/typing/', views.set_typing_indicator, name='set_typing_indicator'),
     path('api/<int:conversation_id>/typing/get/', views.get_typing_indicators, name='get_typing_indicators'),
+    path('api/unread/', views.get_unread_count, name='get_unread_count'),
+    path('api/ping/', views.ping, name='ping'),
 ]

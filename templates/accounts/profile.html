@@ -130,6 +130,56 @@
     </div>
     {% endif %}
 
+    <!-- Documents (own view or accepted employer) -->
+    {% if show_documents and profile.role == 'jobseeker' %}
+    <div class="col-12">
+      <div class="card p-4">
+        <h6 style="font-weight:800;margin-bottom:1.25rem;font-size:0.875rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--slate-light)">
+          <i class="bi bi-shield-check me-1"></i>Verification Documents
+        </h6>
+
+        {% if request.user == target_user %}
+        <p style="font-size:0.82rem;color:var(--slate-light);margin-bottom:1.25rem">
+          These documents are only visible to employers who accept your application.
+          <a href="/accounts/profile/edit/" style="color:var(--amber-dark);font-weight:600">Upload or update documents</a>
+        </p>
+        {% else %}
+        <p style="font-size:0.82rem;color:var(--amber-dark);font-weight:600;margin-bottom:1.25rem">
+          <i class="bi bi-unlock-fill me-1"></i>Visible because you accepted this applicant.
+        </p>
+        {% endif %}
+
+        <div class="row g-3">
+          {% for item in doc_items %}
+          <div class="col-md-4">
+            <div style="border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:1rem 1.1rem;background:var(--paper);height:100%">
+              <div style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:var(--slate-light);margin-bottom:0.6rem">
+                {{ item.label }}
+              </div>
+              {% if item.doc %}
+                <a href="{{ item.doc.file.url }}" target="_blank"
+                   style="display:flex;align-items:center;gap:6px;font-size:0.82rem;font-weight:600;color:var(--ink);text-decoration:none;margin-bottom:0.5rem">
+                  <i class="bi bi-file-earmark-text" style="color:var(--amber-dark);font-size:1.1rem;flex-shrink:0"></i>
+                  <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ item.doc.file_name }}</span>
+                </a>
+                {% if item.doc.is_verified %}
+                  <span class="tag tag-green" style="font-size:0.68rem"><i class="bi bi-patch-check-fill me-1"></i>Verified</span>
+                {% else %}
+                  <span class="tag tag-grey" style="font-size:0.68rem"><i class="bi bi-clock me-1"></i>Pending review</span>
+                {% endif %}
+              {% else %}
+                <span style="font-size:0.82rem;color:var(--slate-light)">
+                  <i class="bi bi-dash me-1"></i>Not uploaded
+                </span>
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
     <!-- Right: reviews -->
     <div class="col-md-7">
       <div class="card p-4">

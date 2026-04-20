@@ -34,7 +34,7 @@
 
         body {
             font-family: var(--font);
-            background: var(--cream);
+            background: #ffffff;
             color: var(--ink);
             min-height: 100vh;
             font-size: 15px;
@@ -49,7 +49,7 @@
 
         /* ── NAVBAR ── */
         .navbar {
-            background: var(--ink);
+            background: #000000;
             padding: 0 2rem;
             height: 68px;
             position: sticky;
@@ -65,7 +65,7 @@
             letter-spacing: -0.5px;
         }
         .navbar-brand span { color: var(--amber); }
-        .nav-link {
+        .navbar .nav-link {
             color: rgba(255,255,255,0.72) !important;
             font-size: 0.875rem;
             font-weight: 500;
@@ -74,8 +74,8 @@
             transition: color 0.18s, background 0.18s;
             letter-spacing: 0.01em;
         }
-        .nav-link:hover { color: var(--white) !important; background: rgba(255,255,255,0.09); }
-        .nav-link.active { color: var(--amber) !important; }
+        .navbar .nav-link:hover { color: var(--white) !important; background: rgba(255,255,255,0.09); }
+        .navbar .nav-link.active { color: var(--amber) !important; }
         .btn-nav-cta {
             background: var(--amber);
             color: var(--ink) !important;
@@ -101,7 +101,7 @@
             align-items: center;
             justify-content: center;
             padding: 0 4px;
-            border: 2px solid var(--ink);
+            border: 2px solid #000000;
             line-height: 1;
             pointer-events: none;
         }
@@ -524,6 +524,122 @@
         .terms-box .form-check { padding-left: 2rem; }
         .terms-box .form-check + .form-check { margin-top: 0.9rem; padding-top: 0.9rem; border-top: 1px solid var(--border); }
 
+        /* ── HAMBURGER BUTTON ── */
+        .hamburger {
+            background: none; border: none; cursor: pointer;
+            padding: 6px; display: flex; flex-direction: column;
+            gap: 5px; align-items: center; justify-content: center;
+            border-radius: var(--radius-xs);
+            transition: background 0.15s;
+        }
+        .hamburger:hover { background: rgba(255,255,255,0.09); }
+        .hb-line {
+            display: block; width: 24px; height: 2px;
+            background: #ffffff; border-radius: 2px;
+            transform-origin: center;
+            transition: transform 0.25s ease, opacity 0.25s ease, width 0.2s ease;
+        }
+        .hamburger.open .hb-line:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .hamburger.open .hb-line:nth-child(2) { opacity: 0; transform: scaleX(0); }
+        .hamburger.open .hb-line:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+        /* ── MOBILE SIDEBAR ── */
+        .sidebar-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.55);
+            z-index: 1040; opacity: 0; pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+        .sidebar-overlay.open { opacity: 1; pointer-events: all; }
+
+        .mobile-sidebar {
+            position: fixed; top: 0; right: -320px;
+            width: 300px; max-width: 85vw; height: 100dvh;
+            background: #000000;
+            z-index: 1041;
+            transition: right 0.28s cubic-bezier(0.4,0,0.2,1);
+            display: flex; flex-direction: column; overflow-y: auto;
+            box-shadow: -4px 0 32px rgba(0,0,0,0.4);
+        }
+        .mobile-sidebar.open { right: 0; }
+
+        .sidebar-head {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 1.25rem; height: 68px; flex-shrink: 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .sidebar-brand {
+            font-family: var(--font); font-weight: 800; font-size: 1.3rem;
+            color: #ffffff !important; text-decoration: none; letter-spacing: -0.5px;
+        }
+        .sidebar-brand span { color: var(--amber); }
+        .sidebar-close {
+            background: none; border: none; color: #ffffff; cursor: pointer;
+            font-size: 1.15rem; padding: 6px 8px; border-radius: var(--radius-xs);
+            transition: background 0.15s, color 0.15s; line-height: 1;
+        }
+        .sidebar-close:hover { background: rgba(255,255,255,0.08); color: var(--amber); }
+
+        .sidebar-nav { padding: 0.5rem 0; flex: 1; }
+        .sidebar-link {
+            display: flex; align-items: center; gap: 0.8rem;
+            padding: 0.82rem 1.5rem;
+            color: #ffffff; text-decoration: none;
+            font-size: 0.9rem; font-weight: 500;
+            border-left: 3px solid transparent;
+            transition: background 0.15s, color 0.15s, border-color 0.15s;
+        }
+        .sidebar-link i { font-size: 1rem; color: rgba(255,255,255,0.45); width: 18px; flex-shrink: 0; transition: color 0.15s; }
+        .sidebar-link:hover { background: rgba(255,255,255,0.06); color: var(--amber); border-left-color: var(--amber); }
+        .sidebar-link:hover i { color: var(--amber); }
+        .sidebar-link.sl-amber { color: var(--amber); font-weight: 700; }
+        .sidebar-link.sl-amber i { color: var(--amber); }
+        .sidebar-link.sl-danger { color: #f87171; }
+        .sidebar-link.sl-danger i { color: #f87171; }
+
+        .sidebar-divider { height: 1px; background: rgba(255,255,255,0.1); margin: 0.4rem 1.25rem; }
+        .sidebar-section-label {
+            padding: 0.75rem 1.5rem 0.3rem;
+            font-size: 0.64rem; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 0.13em;
+            color: rgba(255,255,255,0.35);
+        }
+        .sidebar-user-info {
+            padding: 0.75rem 1.5rem 0.5rem;
+            font-size: 0.8rem; color: rgba(255,255,255,0.55);
+        }
+
+        /* ── DESKTOP DROPDOWN ── */
+        .navbar { flex-wrap: nowrap !important; }
+        .nav-dropdown { position: relative; }
+        .nav-dropdown .dropdown-menu {
+            position: absolute !important;
+            top: calc(100% + 6px) !important;
+            right: 0; left: auto;
+            background: #111111 !important;
+            border: 1px solid rgba(255,255,255,0.12) !important;
+            border-radius: var(--radius) !important;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5) !important;
+            min-width: 220px; padding: 0.4rem 0;
+        }
+        .nav-dropdown .dropdown-menu li div {
+            color: rgba(255,255,255,0.4) !important;
+        }
+        .nav-dropdown .dropdown-item {
+            font-size: 0.875rem; color: rgba(255,255,255,0.78);
+            padding: 0.5rem 1rem; transition: background 0.15s, color 0.15s;
+            background: transparent;
+        }
+        .nav-dropdown .dropdown-item:hover { background: rgba(255,255,255,0.08) !important; color: #ffffff !important; }
+        .nav-dropdown .dropdown-item.text-danger { color: #f87171 !important; }
+        .nav-dropdown .dropdown-item.text-danger:hover { background: rgba(248,113,113,0.12) !important; color: #f87171 !important; }
+        .nav-dropdown .dropdown-item .text-muted { color: rgba(255,255,255,0.35) !important; }
+        .nav-dropdown .dropdown-divider { margin: 0.3rem 0; border-color: rgba(255,255,255,0.1) !important; }
+
+        @media (min-width: 992px) {
+            .sidebar-overlay, .mobile-sidebar { display: none !important; }
+        }
+
         /* ── RESPONSIVE ── */
         @media (max-width: 768px) {
             .hero-title { font-size: 2rem; }
@@ -536,61 +652,156 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-<nav class="navbar navbar-expand-lg">
-    <div class="container">
-        <a class="navbar-brand" href="/">Icon<span>Jobs</span></a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" style="border-color:rgba(255,255,255,0.3)">
-            <span class="navbar-toggler-icon" style="filter:invert(1)"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto ms-3 gap-1">
-                <li class="nav-item"><a class="nav-link" href="/jobs/">Browse Jobs</a></li>
-                <li class="nav-item"><a class="nav-link" href="/career-guide/">Career Guide</a></li>
-                <li class="nav-item"><a class="nav-link" href="/about/">About</a></li>
-                <li class="nav-item"><a class="nav-link" href="/contact/">Contact</a></li>
-                {% if user.is_authenticated %}
-                    {% if user.profile.role == 'jobseeker' %}
-                        <li class="nav-item"><a class="nav-link" href="/jobseeker/dashboard/">My Applications</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/jobs/saved/">Saved Jobs</a></li>
-                    {% elif user.profile.role == 'employer' %}
-                        <li class="nav-item"><a class="nav-link" href="/employer/dashboard/">My Jobs</a></li>
-                        <li class="nav-item"><a class="nav-link btn-nav-cta ms-1" href="/jobs/post/">+ Post a Job</a></li>
-                    {% endif %}
+<nav class="navbar">
+    <div class="container d-flex align-items-center" style="height:68px">
+
+        <!-- Logo -->
+        <a class="navbar-brand me-4" href="/">Icon<span>Jobs</span></a>
+
+        <!-- Desktop centre links (≥992px) -->
+        <ul class="navbar-nav flex-row gap-1 me-auto d-none d-lg-flex">
+            <li class="nav-item"><a class="nav-link" href="/jobs/"><i class="bi bi-search me-1"></i>Browse Jobs</a></li>
+            <li class="nav-item"><a class="nav-link" href="/career-guide/">Career Guide</a></li>
+            <li class="nav-item"><a class="nav-link" href="/about/">About</a></li>
+            <li class="nav-item"><a class="nav-link" href="/contact/">Contact</a></li>
+            {% if user.is_authenticated %}
+                {% if user.profile.role == 'jobseeker' %}
+                    <li class="nav-item"><a class="nav-link" href="/jobseeker/dashboard/">My Applications</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/jobs/saved/">Saved Jobs</a></li>
+                {% elif user.profile.role == 'employer' %}
+                    <li class="nav-item"><a class="nav-link" href="/employer/dashboard/">My Jobs</a></li>
+                    <li class="nav-item"><a class="nav-link btn-nav-cta ms-1" href="/jobs/post/">+ Post a Job</a></li>
                 {% endif %}
-            </ul>
-            <ul class="navbar-nav ms-auto gap-1 align-items-center">
-                {% if user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="/chat/inbox/" style="position:relative;display:inline-flex;align-items:center;gap:6px">
-                            <span class="nav-msg-wrap">
-                                <i class="bi bi-chat-dots" style="font-size:1.05rem"></i>
-                                <span class="nav-unread-badge hidden" id="navUnreadBadge">0</span>
-                            </span>
-                            Messages
-                        </a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                            <i class="bi bi-person-circle me-1"></i>{{ user.first_name|default:user.username }}
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end" style="border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow-md);min-width:200px">
-                            <li><a class="dropdown-item py-2" href="/accounts/profile/"><i class="bi bi-person me-2 text-muted"></i>My Profile</a></li>
-                            <li><a class="dropdown-item py-2" href="/accounts/profile/edit/"><i class="bi bi-pencil me-2 text-muted"></i>Edit Profile</a></li>
-                            {% if user.is_staff %}<li><a class="dropdown-item py-2" href="/admin/"><i class="bi bi-shield-check me-2 text-muted"></i>Admin Panel</a></li>{% endif %}
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item py-2 text-danger" href="/accounts/logout/"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
-                        </ul>
-                    </li>
-                {% else %}
-                    <li class="nav-item"><a class="nav-link" href="/accounts/login/">Sign In</a></li>
-                    <li class="nav-item"><a class="nav-link btn-nav-cta" href="/accounts/register/">Join Free</a></li>
-                {% endif %}
-            </ul>
+            {% endif %}
+        </ul>
+
+        <!-- Desktop right side (≥992px) -->
+        <ul class="navbar-nav flex-row gap-1 align-items-center d-none d-lg-flex">
+            {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" href="/chat/" style="display:inline-flex;align-items:center;gap:6px">
+                        <span class="nav-msg-wrap">
+                            <i class="bi bi-chat-dots" style="font-size:1.05rem"></i>
+                            <span class="nav-unread-badge hidden" id="navUnreadBadge">0</span>
+                        </span>
+                        Messages
+                    </a>
+                </li>
+                <li class="nav-item nav-dropdown dropdown">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center gap-1" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-person-circle"></i>
+                        <span>{{ user.first_name|default:user.username }}</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><div style="padding:0.5rem 1rem 0.25rem;font-size:0.75rem;color:var(--slate-light);font-weight:600">{{ user.get_full_name|default:user.username }}</div></li>
+                        <li><hr class="dropdown-divider my-1"></li>
+                        {% if user.profile.role == 'jobseeker' %}
+                            <li><a class="dropdown-item py-2" href="/jobseeker/dashboard/"><i class="bi bi-grid me-2 text-muted"></i>Dashboard</a></li>
+                            <li><a class="dropdown-item py-2" href="/my-applications/"><i class="bi bi-file-text me-2 text-muted"></i>My Applications</a></li>
+                            <li><a class="dropdown-item py-2" href="/jobs/saved/"><i class="bi bi-bookmark me-2 text-muted"></i>Saved Jobs</a></li>
+                        {% elif user.profile.role == 'employer' %}
+                            <li><a class="dropdown-item py-2" href="/employer/dashboard/"><i class="bi bi-grid me-2 text-muted"></i>Dashboard</a></li>
+                            <li><a class="dropdown-item py-2" href="/jobs/post/" style="color:var(--amber-dark);font-weight:600"><i class="bi bi-plus-circle me-2"></i>Post a Job</a></li>
+                            <li><a class="dropdown-item py-2" href="/employer/dashboard/"><i class="bi bi-briefcase me-2 text-muted"></i>My Jobs</a></li>
+                        {% endif %}
+                        <li><a class="dropdown-item py-2" href="/accounts/profile/"><i class="bi bi-person me-2 text-muted"></i>My Profile</a></li>
+                        <li><a class="dropdown-item py-2" href="/accounts/profile/edit/"><i class="bi bi-pencil me-2 text-muted"></i>Edit Profile</a></li>
+                        {% if user.is_staff %}<li><a class="dropdown-item py-2" href="/admin/"><i class="bi bi-shield-check me-2 text-muted"></i>Admin Panel</a></li>{% endif %}
+                        <li><hr class="dropdown-divider my-1"></li>
+                        <li><a class="dropdown-item py-2 text-danger" href="/accounts/logout/"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+                    </ul>
+                </li>
+            {% else %}
+                <li class="nav-item"><a class="nav-link" href="/accounts/login/">Sign In</a></li>
+                <li class="nav-item"><a class="nav-link btn-nav-cta ms-1" href="/accounts/register/">Join Free</a></li>
+            {% endif %}
+        </ul>
+
+        <!-- Mobile right side (<992px) -->
+        <div class="d-flex d-lg-none align-items-center gap-2 ms-auto">
+            {% if user.is_authenticated %}
+            <a href="/chat/" class="nav-link d-flex align-items-center" style="padding:0.3rem 0.5rem !important">
+                <span class="nav-msg-wrap">
+                    <i class="bi bi-chat-dots" style="font-size:1.15rem"></i>
+                    <span class="nav-unread-badge hidden" id="navUnreadBadgeMobile">0</span>
+                </span>
+            </a>
+            {% endif %}
+            <button class="hamburger" id="hamburgerBtn" aria-label="Open menu" aria-expanded="false">
+                <span class="hb-line"></span>
+                <span class="hb-line"></span>
+                <span class="hb-line"></span>
+            </button>
         </div>
+
     </div>
 </nav>
 
-{% if not request.resolver_match.url_name in 'inbox,inbox_conv' %}
+<!-- Mobile sidebar overlay -->
+<div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
+
+<!-- Mobile sidebar -->
+<aside class="mobile-sidebar" id="mobileSidebar" aria-label="Mobile navigation">
+    <div class="sidebar-head">
+        <a class="sidebar-brand" href="/">Icon<span>Jobs</span></a>
+        <button class="sidebar-close" id="closeSidebarBtn" aria-label="Close menu">
+            <i class="bi bi-x-lg"></i>
+        </button>
+    </div>
+
+    <nav class="sidebar-nav">
+        {% if user.is_authenticated %}
+        <div class="sidebar-user-info">
+            <i class="bi bi-person-circle me-1"></i>
+            <strong style="color:#ffffff">{{ user.get_full_name|default:user.username }}</strong>
+            {% if user.profile.role == 'jobseeker' %}
+            <span style="margin-left:6px;font-size:0.7rem;background:rgba(232,160,32,0.2);color:var(--amber);padding:2px 7px;border-radius:99px;font-weight:700">Job Seeker</span>
+            {% elif user.profile.role == 'employer' %}
+            <span style="margin-left:6px;font-size:0.7rem;background:rgba(232,160,32,0.2);color:var(--amber);padding:2px 7px;border-radius:99px;font-weight:700">Employer</span>
+            {% endif %}
+        </div>
+        <div class="sidebar-divider"></div>
+        {% endif %}
+
+        <div class="sidebar-section-label">Navigation</div>
+        <a href="/jobs/" class="sidebar-link"><i class="bi bi-search"></i>Browse Jobs</a>
+        <a href="/career-guide/" class="sidebar-link"><i class="bi bi-book"></i>Career Guide</a>
+        <a href="/about/" class="sidebar-link"><i class="bi bi-info-circle"></i>About</a>
+        <a href="/contact/" class="sidebar-link"><i class="bi bi-envelope"></i>Contact</a>
+
+        {% if user.is_authenticated %}
+        <div class="sidebar-divider" style="margin-top:0.75rem"></div>
+        <div class="sidebar-section-label">My Account</div>
+
+            {% if user.profile.role == 'jobseeker' %}
+            <a href="/jobseeker/dashboard/" class="sidebar-link"><i class="bi bi-grid"></i>Dashboard</a>
+            <a href="/my-applications/" class="sidebar-link"><i class="bi bi-file-text"></i>My Applications</a>
+            <a href="/jobs/saved/" class="sidebar-link"><i class="bi bi-bookmark"></i>Saved Jobs</a>
+            {% elif user.profile.role == 'employer' %}
+            <a href="/employer/dashboard/" class="sidebar-link"><i class="bi bi-grid"></i>Dashboard</a>
+            <a href="/jobs/post/" class="sidebar-link sl-amber"><i class="bi bi-plus-circle-fill"></i>Post a Job</a>
+            <a href="/employer/dashboard/" class="sidebar-link"><i class="bi bi-briefcase"></i>My Jobs</a>
+            {% endif %}
+
+        <a href="/accounts/profile/" class="sidebar-link"><i class="bi bi-person"></i>My Profile</a>
+        <a href="/chat/" class="sidebar-link"><i class="bi bi-chat-dots"></i>Messages</a>
+        <a href="/accounts/profile/edit/" class="sidebar-link"><i class="bi bi-pencil"></i>Edit Profile</a>
+        {% if user.is_staff %}
+        <a href="/admin/" class="sidebar-link"><i class="bi bi-shield-check"></i>Admin Panel</a>
+        {% endif %}
+
+        <div class="sidebar-divider" style="margin-top:0.75rem"></div>
+        <a href="/accounts/logout/" class="sidebar-link sl-danger"><i class="bi bi-box-arrow-right"></i>Logout</a>
+
+        {% else %}
+        <div class="sidebar-divider" style="margin-top:0.75rem"></div>
+        <a href="/accounts/login/" class="sidebar-link"><i class="bi bi-person"></i>Sign In</a>
+        <a href="/accounts/register/" class="sidebar-link sl-amber"><i class="bi bi-star"></i>Join Free</a>
+        {% endif %}
+    </nav>
+</aside>
+
+{% if messages and not request.resolver_match.url_name in 'inbox,inbox_conv' %}
 <div class="container mt-3">
     {% for message in messages %}
         <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert" style="font-size:0.875rem">
@@ -647,5 +858,57 @@
 {% endif %}
 
 {% block extra_js %}{% endblock %}
+
+<script>
+(function () {
+    var btn  = document.getElementById('hamburgerBtn');
+    var side = document.getElementById('mobileSidebar');
+    var over = document.getElementById('sidebarOverlay');
+    var closeBtn = document.getElementById('closeSidebarBtn');
+
+    function openSidebar() {
+        side.classList.add('open');
+        over.classList.add('open');
+        btn.classList.add('open');
+        btn.setAttribute('aria-expanded', 'true');
+        document.body.style.overflow = 'hidden';
+    }
+    function closeSidebar() {
+        side.classList.remove('open');
+        over.classList.remove('open');
+        btn && btn.classList.remove('open');
+        btn && btn.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+    }
+
+    btn      && btn.addEventListener('click', openSidebar);
+    closeBtn && closeBtn.addEventListener('click', closeSidebar);
+    over     && over.addEventListener('click', closeSidebar);
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeSidebar();
+    });
+
+    // Close sidebar when a sidebar link is clicked (navigate away)
+    side && side.querySelectorAll('.sidebar-link').forEach(function (link) {
+        link.addEventListener('click', closeSidebar);
+    });
+
+    // Sync mobile unread badge with desktop badge
+    var desktopBadge = document.getElementById('navUnreadBadge');
+    var mobileBadge  = document.getElementById('navUnreadBadgeMobile');
+    if (desktopBadge && mobileBadge) {
+        var observer = new MutationObserver(function () {
+            mobileBadge.textContent = desktopBadge.textContent;
+            if (desktopBadge.classList.contains('hidden')) {
+                mobileBadge.classList.add('hidden');
+            } else {
+                mobileBadge.classList.remove('hidden');
+            }
+        });
+        observer.observe(desktopBadge, { attributes: true, childList: true, characterData: true, subtree: true });
+    }
+})();
+</script>
 </body>
 </html>

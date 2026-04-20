@@ -104,6 +104,103 @@
       </div>
       {% endif %}
 
+      {% if profile.role == 'jobseeker' %}
+      <!-- VERIFICATION DOCUMENTS -->
+      <div style="height:1px;background:var(--border);margin-bottom:1.5rem"></div>
+      <p class="form-section-label">Verification Documents</p>
+      <p style="font-size:0.85rem;color:var(--slate-light);margin-bottom:1.5rem">
+        <i class="bi bi-shield-check me-1"></i>
+        Upload your documents for identity verification. These are only shared with employers who accept your application.
+        PDF, JPG, or PNG — max 10 MB each.
+      </p>
+
+      <div class="row g-3 mb-4">
+
+        <div class="col-12">
+          <div style="border:1.5px solid var(--border-input);border-radius:var(--radius-sm);padding:1.1rem 1.25rem;background:#fff">
+            <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap">
+              <div style="flex:1;min-width:0">
+                <div class="form-label mb-1">DBS Check <span style="font-weight:400;color:var(--slate-light);text-transform:none;font-size:0.78rem;letter-spacing:0">(Disclosure and Barring Service)</span></div>
+                <div style="font-size:0.78rem;color:var(--slate-light);margin-bottom:0.6rem">Criminal record check certificate. Required for most care, education, and childcare roles.</div>
+                {% if uploaded_docs.dbs_check %}
+                <div style="font-size:0.78rem;color:var(--success);margin-bottom:0.5rem">
+                  <i class="bi bi-check-circle-fill me-1"></i>
+                  Uploaded: <a href="{{ uploaded_docs.dbs_check.file.url }}" target="_blank" style="color:var(--amber-dark);font-weight:600">{{ uploaded_docs.dbs_check.file_name }}</a>
+                  {% if uploaded_docs.dbs_check.is_verified %}<span class="tag tag-green ms-1">Verified</span>{% else %}<span class="tag tag-grey ms-1">Pending review</span>{% endif %}
+                </div>
+                {% endif %}
+              </div>
+              <div style="flex-shrink:0;min-width:220px">
+                <input type="file" name="dbs_check" class="form-control" accept=".pdf,.jpg,.jpeg,.png">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <div style="border:1.5px solid var(--border-input);border-radius:var(--radius-sm);padding:1.1rem 1.25rem;background:#fff">
+            <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap">
+              <div style="flex:1;min-width:0">
+                <div class="form-label mb-1">National Insurance Number</div>
+                <div style="font-size:0.78rem;color:var(--slate-light);margin-bottom:0.6rem">Upload a document showing your NI number (e.g. HMRC letter, payslip, or NI card).</div>
+                {% if uploaded_docs.national_insurance %}
+                <div style="font-size:0.78rem;color:var(--success);margin-bottom:0.5rem">
+                  <i class="bi bi-check-circle-fill me-1"></i>
+                  Uploaded: <a href="{{ uploaded_docs.national_insurance.file.url }}" target="_blank" style="color:var(--amber-dark);font-weight:600">{{ uploaded_docs.national_insurance.file_name }}</a>
+                  {% if uploaded_docs.national_insurance.is_verified %}<span class="tag tag-green ms-1">Verified</span>{% else %}<span class="tag tag-grey ms-1">Pending review</span>{% endif %}
+                </div>
+                {% endif %}
+              </div>
+              <div style="flex-shrink:0;min-width:220px">
+                <input type="file" name="national_insurance" class="form-control" accept=".pdf,.jpg,.jpeg,.png">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <div style="border:1.5px solid var(--border-input);border-radius:var(--radius-sm);padding:1.1rem 1.25rem;background:#fff">
+            <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap">
+              <div style="flex:1;min-width:0">
+                <div class="form-label mb-1">Work Permit / Visa <span style="font-weight:400;color:var(--slate-light);text-transform:none;font-size:0.78rem;letter-spacing:0">(non-UK nationals)</span></div>
+                <div style="font-size:0.78rem;color:var(--slate-light);margin-bottom:0.6rem">Upload a copy of your valid UK work permit, Biometric Residence Permit (BRP), or relevant visa page.</div>
+                {% if uploaded_docs.work_permit_visa %}
+                <div style="font-size:0.78rem;color:var(--success);margin-bottom:0.5rem">
+                  <i class="bi bi-check-circle-fill me-1"></i>
+                  Uploaded: <a href="{{ uploaded_docs.work_permit_visa.file.url }}" target="_blank" style="color:var(--amber-dark);font-weight:600">{{ uploaded_docs.work_permit_visa.file_name }}</a>
+                  {% if uploaded_docs.work_permit_visa.is_verified %}<span class="tag tag-green ms-1">Verified</span>{% else %}<span class="tag tag-grey ms-1">Pending review</span>{% endif %}
+                </div>
+                {% endif %}
+              </div>
+              <div style="flex-shrink:0;min-width:220px">
+                <input type="file" name="work_permit_visa" class="form-control" accept=".pdf,.jpg,.jpeg,.png">
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      {% endif %}
+
+      <!-- CHANGE PASSWORD -->
+      <div style="height:1px;background:var(--border);margin-bottom:1.5rem"></div>
+      <p class="form-section-label">Change Password</p>
+      <p style="font-size:0.85rem;color:var(--slate-light);margin-bottom:1.25rem">Leave all three fields blank if you don't want to change your password.</p>
+      <div class="row g-3 mb-4">
+        <div class="col-12">
+          <label class="form-label">Current Password</label>
+          <input type="password" name="current_password" class="form-control" placeholder="Enter your current password" autocomplete="current-password">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">New Password</label>
+          <input type="password" name="new_password1" class="form-control" placeholder="At least 8 characters" autocomplete="new-password">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Confirm New Password</label>
+          <input type="password" name="new_password2" class="form-control" placeholder="Repeat new password" autocomplete="new-password">
+        </div>
+      </div>
+
       <!-- PRIVACY SETTINGS -->
       <div style="height:1px;background:var(--border);margin-bottom:1.5rem"></div>
       <p class="form-section-label">Privacy Settings</p>
