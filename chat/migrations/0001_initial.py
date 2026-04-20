@@ -10,7 +10,6 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('jobs', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
@@ -21,7 +20,6 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('last_message_at', models.DateTimeField(auto_now=True)),
-                ('job', models.ForeignKey(blank=True, help_text='Optional: link to specific job', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='conversations', to='jobs.job')),
                 ('participants', models.ManyToManyField(related_name='conversations', to=settings.AUTH_USER_MODEL)),
             ],
             options={
