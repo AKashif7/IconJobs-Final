@@ -2,7 +2,7 @@ from pathlib import Path
 import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-SECRET_KEY = 'django-insecure-iconjobs-dev-key-change-in-production-2025'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-local-dev-only-not-for-production')
 DEBUG = True
 ALLOWED_HOSTS = ['*']
 
