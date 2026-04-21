@@ -165,6 +165,11 @@
               <i class="bi bi-chat-dots me-1"></i>Open Chat
             </a>
             {% endif %}
+            <a href="/employer/applications/{{ app.pk }}/cancel/"
+               class="btn btn-sm w-100"
+               style="background:#fce8e6;color:#842029;border:1px solid #f5c6cb">
+              <i class="bi bi-x-circle me-1"></i>Cancel Applicant
+            </a>
 
             {% elif app.status == 'completed' %}
             <div class="text-center" style="font-size:0.8rem;color:var(--success)">
@@ -178,6 +183,16 @@
             <div class="text-center" style="font-size:0.78rem;color:var(--danger)">
               <i class="bi bi-x-circle me-1"></i>Rejected
             </div>
+
+            {% elif app.status == 'cancelled' %}
+            <div class="text-center" style="font-size:0.78rem;color:#842029">
+              <i class="bi bi-slash-circle me-1"></i>Cancelled by You
+            </div>
+            {% if app.cancellation_reason %}
+            <div style="font-size:0.75rem;color:var(--slate-light);background:var(--paper);border-radius:var(--radius-xs);padding:0.5rem 0.75rem;border:1px solid var(--border);margin-top:0.25rem">
+              {{ app.cancellation_reason|title }}
+            </div>
+            {% endif %}
             {% endif %}
 
             {% if app.status != 'accepted' %}

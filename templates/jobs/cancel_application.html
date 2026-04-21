@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block title %}Cancel Application — IconJobs{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="container">
+    <a href="/employer/jobs/{{ job.pk }}/applicants/" style="color:rgba(255,255,255,0.5);font-size:0.82rem;text-decoration:none;display:inline-flex;align-items:center;gap:4px;margin-bottom:0.75rem">
+      <i class="bi bi-arrow-left"></i> Back to Applicants
+    </a>
+    <h1 class="mt-1">Cancel Application</h1>
+    <p style="color:rgba(255,255,255,0.55);margin-top:0.35rem;font-size:0.875rem">
+      {{ job.title }} &bull; {{ application.applicant.get_full_name|default:application.applicant.username }}
+    </p>
+  </div>
+</div>
+
+<div class="container py-5" style="max-width:680px">
+  <div style="background:var(--white);border-radius:var(--radius);border:1px solid var(--border);padding:2.5rem">
+
+    <div style="text-align:center;margin-bottom:2rem">
+      <div style="width:64px;height:64px;border-radius:50%;background:#fce8e6;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem">
+        <i class="bi bi-exclamation-triangle-fill" style="color:#c0392b;font-size:1.6rem"></i>
+      </div>
+      <h2 style="font-weight:900;font-size:1.45rem;color:var(--ink);margin-bottom:0.4rem">
+        Why would you like to cancel this accepted application?
+      </h2>
+      <p style="color:var(--slate-light);font-size:0.875rem;max-width:460px;margin:0 auto">
+        This will notify the applicant and change their application status to cancelled.
+        This action cannot be undone.
+      </p>
+    </div>
+
+    {% if error %}
+    <div class="alert alert-danger" style="font-size:0.875rem">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST">
+      {% csrf_token %}
+
+      <div style="margin-bottom:1.5rem">
+        <label style="font-weight:700;font-size:0.875rem;display:block;margin-bottom:0.75rem;color:var(--ink)">
+          Select a reason <span style="color:#c0392b">*</span>
+        </label>
+        {% for value, label in reasons %}
+        <label style="display:flex;align-items:center;gap:0.75rem;padding:0.75rem 1rem;border:1.5px solid var(--border);border-radius:var(--radius-sm);margin-bottom:0.5rem;cursor:pointer;transition:border-color 0.15s"
+               onmouseover="this.style.borderColor='var(--amber)'"
+               onmouseout="if(!this.querySelector('input').checked) this.style.borderColor='var(--border)'">
+          <input type="radio" name="reason" value="{{ value }}" required
+                 style="accent-color:var(--amber-dark);width:17px;height:17px;flex-shrink:0"
+                 onchange="document.querySelectorAll('.reason-label').forEach(l=>{l.style.borderColor='var(--border)';l.style.background=''});this.closest('label').style.borderColor='var(--amber-dark)';this.closest('label').style.background='var(--amber-light)'">
+          <span style="font-size:0.875rem;color:var(--ink)" class="reason-label">{{ label }}</span>
+        </label>
+        {% endfor %}
+      </div>
+
+      <div style="margin-bottom:1.75rem">
+        <label for="detail" style="font-weight:700;font-size:0.875rem;display:block;margin-bottom:0.5rem;color:var(--ink)">
+          Additional details <span style="color:var(--slate-light);font-weight:400">(optional)</span>
+        </label>
+        <textarea id="detail" name="detail" rows="4"
+                  class="form-control"
+                  placeholder="Explain in more detail why you need to cancel this application. The applicant may see this information."
+                  style="resize:vertical;font-size:0.875rem"></textarea>
+      </div>
+
+      <div class="d-flex gap-3">
+        <a href="/employer/jobs/{{ job.pk }}/applicants/"
+           class="btn btn-outline-ink flex-fill text-center">
+          <i class="bi bi-arrow-left me-1"></i>Go Back
+        </a>
+        <button type="submit" class="btn btn-danger flex-fill"
+                onclick="return confirm('Are you sure you want to cancel this application? This cannot be undone.')">
+          <i class="bi bi-x-circle me-1"></i>Cancel Application
+        </button>
+      </div>
+    </form>
+
+  </div>
+</div>
+{% endblock %}

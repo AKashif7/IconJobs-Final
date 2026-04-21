@@ -270,6 +270,49 @@ def update_application(request, app_pk):
 
 
 @login_required
+def cancel_application(request, app_pk):
+    application = get_object_or_404(Application, pk=app_pk, job__employer=request.user)
+
+    if application.status not in ('accepted', 'shortlisted', 'pending'):
+        messages.error(request, 'This application cannot be cancelled.')
+        return redirect('view_applicants', job_pk=application.job.pk)
+
+    CANCEL_REASONS = [
+        ('position_filled', 'Position has been filled by someone else'),
+        ('job_cancelled', 'The job has been cancelled'),
+        ('schedule_conflict', 'Schedule or timing no longer works'),
+        ('budget_change', 'Budget constraints or pay rate changed'),
+        ('applicant_unresponsive', 'Applicant has not responded'),
+        ('role_changed', 'Role requirements have changed significantly'),
+        ('business_closed', 'Business is temporarily or permanently closed'),
+        ('other', 'Other reason'),
+    ]
+
+    if request.method == 'POST':
+        reason = request.POST.get('reason', '').strip()
+        detail = request.POST.get('detail', '').strip()
+        if not reason:
+            return render(request, 'jobs/cancel_application.html', {
+                'application': application,
+                'job': application.job,
+                'reasons': CANCEL_REASONS,
+                'error': 'Please select a reason.',
+            })
+        application.status = 'cancelled'
+        application.cancellation_reason = reason
+        application.cancellation_detail = detail
+        application.save()
+        messages.success(request, f'Application for {application.applicant.get_full_name() or application.applicant.username} has been cancelled.')
+        return redirect('view_applicants', job_pk=application.job.pk)
+
+    return render(request, 'jobs/cancel_application.html', {
+        'application': application,
+        'job': application.job,
+        'reasons': CANCEL_REASONS,
+    })
+
+
+@login_required
 def jobseeker_dashboard(request):
     profile = get_object_or_404(UserProfile, user=request.user)
     if profile.role != 'jobseeker':

@@ -84,6 +84,7 @@ class Application(models.Model):
         ('rejected', 'Rejected'),
         ('completed', 'Completed'),
         ('withdrawn', 'Withdrawn'),
+        ('cancelled', 'Cancelled by Employer'),
     ]
 
     job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='applications')
@@ -95,6 +96,10 @@ class Application(models.Model):
 
     # Contact reveal happens once employer accepts
     contact_revealed = models.BooleanField(default=False)
+
+    # Populated when employer cancels an accepted application
+    cancellation_reason = models.CharField(max_length=100, blank=True)
+    cancellation_detail = models.TextField(blank=True)
 
     class Meta:
         unique_together = ('job', 'applicant')
