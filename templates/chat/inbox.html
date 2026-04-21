@@ -154,6 +154,11 @@
                         <div class="d-flex flex-column align-items-end">
                             <div class="chat-bubble mine">{{ msg.content }}</div>
                             <div class="chat-time mine-time">{{ msg.sent_at|date:"d M, H:i" }}</div>
+                            {% if msg.id == last_read_sent_id %}
+                            <div style="font-size:0.65rem;color:var(--slate-light);margin-top:1px;display:flex;align-items:center;gap:3px">
+                                <i class="bi bi-check2-all" style="color:var(--amber-dark);font-size:0.75rem"></i> Seen
+                            </div>
+                            {% endif %}
                         </div>
                     {% else %}
                         <div class="d-flex align-items-end gap-2">
@@ -198,7 +203,7 @@
                 <form method="POST" action="/chat/inbox/{{ active_conv.pk }}/" class="d-flex gap-2">
                     {% csrf_token %}
                     <input type="text" name="content" id="msgInput" class="form-control"
-                           placeholder="Type a message..." autocomplete="off" required>
+                           placeholder="Type a message..." autocomplete="off" required autofocus>
                     <button type="submit" class="btn btn-amber px-4">
                         <i class="bi bi-send-fill"></i>
                     </button>
@@ -228,6 +233,9 @@ function insertQuick(text) {
     const el = document.getElementById('msgInput');
     if (el) { el.value = text; el.focus(); }
 }
+
+// Ping immediately so this user shows as online right away
+fetch('/chat/api/ping/').catch(() => {});
 
 function formatLastSeen(isoStr) {
     if (!isoStr) return 'Offline';
@@ -272,6 +280,7 @@ function pollOnline() {
     });
 }
 
-if (uids.size > 0) { pollOnline(); setInterval(pollOnline, 20000); }
+// Poll every 15s on the chat page for snappy online indicators
+if (uids.size > 0) { pollOnline(); setInterval(pollOnline, 15000); }
 </script>
 {% endblock %}

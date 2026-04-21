@@ -4,10 +4,13 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.core.cache import cache
 import json
 
 from .models import Conversation, Message, TypingIndicator
 from jobs.models import Job
+
+ONLINE_TIMEOUT = 120  # seconds — user is "online" if pinged within 2 minutes
 
 
 @login_required
@@ -75,6 +78,13 @@ def inbox(request, conversation_id=None):
             app and app.status in ('accepted', 'completed') and app.contact_revealed
         )
 
+        # ID of the last message sent by me that the other person has read
+        last_read_sent = active_messages.filter(
+            sender=request.user,
+            read_at__isnull=False,
+        ).last()
+        last_read_sent_id = last_read_sent.id if last_read_sent else None
+
         context.update({
             'active_conv': active_conv,
             'active_other': active_other,
@@ -83,6 +93,7 @@ def inbox(request, conversation_id=None):
             'is_employer': is_employer,
             'show_contact': show_contact,
             'app': app,
+            'last_read_sent_id': last_read_sent_id,
         })
 
     return render(request, 'chat/inbox.html', context)
@@ -275,12 +286,20 @@ def get_unread_count(request):
 @login_required
 @require_http_methods(["GET"])
 def get_online_status(request):
+    uid = request.GET.get('uid')
+    if uid:
+        last_seen_iso = cache.get(f'online_{uid}')
+        if last_seen_iso:
+            return JsonResponse({'online': True, 'last_seen': last_seen_iso})
+        return JsonResponse({'online': False, 'last_seen': None})
     return JsonResponse({'online': False, 'last_seen': None})
 
 
 @login_required
 @require_http_methods(["GET"])
 def ping(request):
+    now_iso = timezone.now().isoformat()
+    cache.set(f'online_{request.user.id}', now_iso, ONLINE_TIMEOUT)
     return JsonResponse({'ok': True})
 
 
