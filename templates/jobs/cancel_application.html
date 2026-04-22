@@ -1,6 +1,21 @@
 {% extends 'base.html' %}
 {% block title %}Cancel Application — IconJobs{% endblock %}
 
+<!--
+    cancel_application.html — confirmation form for an employer cancelling
+    an accepted or shortlisted application.
+
+    The page shows a warning icon and explanation, then a list of predefined
+    radio-button reasons (position filled, job cancelled, budget change, etc.)
+    so the data stays consistent and searchable. An optional free-text textarea
+    lets the employer add more detail.
+
+    The reason choices come from the CANCEL_REASONS list in cancel_application()
+    in jobs/views.py. A JavaScript confirm() dialog provides a final
+    "are you sure?" check before the form submits, since the action is irreversible.
+    Any validation error (e.g. no reason selected) is shown above the form.
+-->
+
 {% block content %}
 <div class="page-header">
   <div class="container">

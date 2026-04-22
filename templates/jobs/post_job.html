@@ -1,6 +1,21 @@
 {% extends 'base.html' %}
 {% block title %}{% if editing %}Edit Job{% else %}Post a Job{% endif %} — IconJobs{% endblock %}
 {% block content %}
+
+<!--
+    post_job.html — used for both posting a new job AND editing an existing one.
+    The 'editing' context variable (set by edit_job() in views.py) toggles the
+    page title and submit button label between "Post a New Job" / "Edit Job Posting".
+
+    The form is split into three visual sections separated by horizontal dividers:
+      1. Job Details  — title, category, location.
+      2. Schedule & Pay — duration, pay rate, pay type, spots available, start date.
+      3. Job Description — the full free-text description textarea.
+
+    Required fields are marked with a red asterisk (*) and Django renders
+    any validation errors directly below the offending field.
+-->
+
 <div class="container py-5" style="max-width:740px">
 
   <a href="/employer/dashboard/" style="font-size:0.85rem;color:var(--amber-dark);font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:4px;margin-bottom:1.5rem">

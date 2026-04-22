@@ -2,15 +2,27 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 
+# Database models for the accounts app. This file defines the shape of every
+# user-related table in the database: profiles, uploaded documents, the
+# verification queue that admins review, and the rating system that lets
+# employers score job seekers they've worked with.
+
 
 class UserProfile(models.Model):
+    # Every registered user is either a job seeker or an employer. This drives
+    # which fields are shown, which pages they can access, and what actions
+    # they're allowed to take throughout the platform.
     ROLE_CHOICES = [
         ('jobseeker', 'Job Seeker'),
         ('employer', 'Employer'),
     ]
 
+    # One-to-one relationship with Django's built-in User model. When a User
+    # is deleted, their profile is deleted too (CASCADE).
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     role = models.CharField(max_length=20, choices=ROLE_CHOICES)
+
+    # Fields shared between both user types.
     bio = models.TextField(blank=True)
     location = models.CharField(max_length=100, blank=True)
     phone = models.CharField(max_length=20, blank=True)
@@ -26,11 +38,13 @@ class UserProfile(models.Model):
     company_description = models.TextField(blank=True)
     website = models.URLField(blank=True)
 
-    # Contact reveal (only after acceptance)
+    # Contact details (phone/email) are hidden by default and only revealed
+    # to an employer once they've formally accepted an applicant for a job.
     reveal_phone = models.BooleanField(default=False)
     reveal_email = models.BooleanField(default=False)
 
-    # NEW: Verification system
+    # Verification system — admins review uploaded documents and can award a
+    # blue tick badge to verified job seekers, building trust on the platform.
     is_verified = models.BooleanField(default=False, help_text="Admin has verified this user")
     blue_tick_awarded = models.BooleanField(default=False, help_text="User has blue tick badge")
     verification_submitted_at = models.DateTimeField(null=True, blank=True, help_text="When user submitted documents")
@@ -44,6 +58,9 @@ class UserProfile(models.Model):
 
     @property
     def average_rating(self):
+        # Calculates the mean score across all ratings this user has received.
+        # Returns None if they haven't been rated yet, so templates can show
+        # "No ratings yet" rather than 0/5.
         ratings = self.ratings_received.all()
         if not ratings:
             return None
@@ -51,6 +68,8 @@ class UserProfile(models.Model):
 
     @property
     def jobs_completed(self):
+        # Counts how many jobs this seeker has had marked as 'completed' by
+        # an employer — used on the profile page as a trust signal.
         from jobs.models import Application
         return Application.objects.filter(
             applicant=self.user,
@@ -59,7 +78,9 @@ class UserProfile(models.Model):
 
 
 class UserDocument(models.Model):
-    """Store uploaded documents for job seekers (DBS, NIN, work permits, etc.)"""
+    # Stores the actual uploaded files that job seekers submit for identity
+    # verification (DBS check, National Insurance, work permit, etc.).
+    # Each user can have at most one document per type (unique_together).
     DOCUMENT_TYPES = [
         ('profile_photo', 'Profile Photo'),
         ('dbs_check', 'DBS Check Certificate'),
@@ -69,9 +90,14 @@ class UserDocument(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='documents')
     document_type = models.CharField(max_length=30, choices=DOCUMENT_TYPES)
+
+    # Files are organised into dated folders (uploads/user_documents/YYYY/MM/DD/)
+    # so they don't all pile into one flat directory.
     file = models.FileField(upload_to='user_documents/%Y/%m/%d/')
     file_name = models.CharField(max_length=255)
     file_size_bytes = models.IntegerField()
+
+    # Admins tick this once they've manually reviewed and approved the document.
     is_verified = models.BooleanField(default=False)
     admin_notes = models.TextField(blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
@@ -85,23 +111,30 @@ class UserDocument(models.Model):
 
 
 class VerificationQueue(models.Model):
-    """Admin queue for reviewing user documents"""
+    # When a job seeker submits their documents, a queue entry is created here
+    # so admins have a clear list of who needs reviewing. The status moves
+    # from pending → approved or rejected.
     STATUS_CHOICES = [
         ('pending', 'Pending Review'),
         ('approved', 'Approved'),
         ('rejected', 'Rejected'),
     ]
 
+    # One entry per user — if they resubmit documents, we update the existing
+    # entry rather than creating duplicates.
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='verification_queue')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     submitted_at = models.DateTimeField(auto_now_add=True)
     reviewed_at = models.DateTimeField(null=True, blank=True)
-    reviewed_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, 
+
+    # Tracks which admin made the decision, for accountability.
+    reviewed_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True,
                                      related_name='verifications_reviewed')
     rejection_reason = models.TextField(blank=True)
     admin_notes = models.TextField(blank=True)
 
     class Meta:
+        # Oldest submissions first — fair first-come, first-served for admins.
         ordering = ['submitted_at']
 
     def __str__(self):
@@ -109,6 +142,9 @@ class VerificationQueue(models.Model):
 
 
 class Rating(models.Model):
+    # Allows employers to leave a star rating (1–5) and optional comment
+    # for a job seeker after working with them. Each employer can only rate
+    # a given seeker once (unique_together).
     reviewer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='ratings_given')
     reviewed = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='ratings_received')
     score = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])

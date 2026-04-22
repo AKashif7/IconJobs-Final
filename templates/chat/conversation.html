@@ -4,6 +4,32 @@
     {% else %}Chat — IconJobs{% endif %}
 {% endblock %}
 
+<!--
+    conversation.html — standalone single-conversation view.
+    This is an alternative to the split-panel inbox.html — it shows just
+    one conversation on its own page, useful for deep-linking directly into
+    a specific chat thread.
+
+    Sections (top to bottom):
+      - Back link to the main inbox.
+      - Header card: other user's avatar, name, and the linked job title
+        (location + duration) if the conversation was started from a job
+        application. An application status badge is shown on the right.
+      - Contact details banner: the amber unlock panel showing email/phone,
+        only rendered when show_contact is True (i.e. application accepted
+        and contact_revealed set).
+      - Chat window (.chat-box): message bubbles rendered oldest-to-newest.
+        Own messages appear on the right (dark bubble), theirs on the left
+        (light bubble) with the sender's first name shown above.
+      - Quick-reply buttons: same employer vs seeker contextual shortcuts
+        as in inbox.html, pre-filling the message input via insertQuick().
+      - Input form: text field + send button, POST with redirect (PRG pattern).
+
+    The extra_js block auto-scrolls chatBox to the bottom on load and
+    wires up insertQuick() for the quick-reply buttons.
+-->
+
+
 {% block extra_css %}
 <style>
     .chat-box {

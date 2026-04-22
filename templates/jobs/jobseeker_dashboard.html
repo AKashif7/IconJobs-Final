@@ -1,6 +1,23 @@
 {% extends 'base.html' %}
 {% block title %}My Applications — IconJobs{% endblock %}
 {% block content %}
+
+<!--
+    jobseeker_dashboard.html — the job seeker's application tracking panel.
+    Lists every application the seeker has submitted, newest first, each card
+    showing:
+      - Job title (linked to the job detail page), status badge, employer
+        name, location, and duration.
+      - Time since application and the pay rate.
+      - A "Chat" button linking to the conversation (only visible if the
+        application has been accepted and a conversation exists).
+      - An amber banner when accepted, prompting the seeker to start chatting.
+
+    If no applications exist yet, an empty-state prompt links to /jobs/ so
+    the seeker can start browsing. Data comes from jobseeker_dashboard()
+    in jobs/views.py.
+-->
+
 <div class="page-header">
   <div class="container">
     <p class="section-label mb-2">Job Seeker Panel</p>

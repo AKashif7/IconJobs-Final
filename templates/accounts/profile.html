@@ -1,6 +1,36 @@
 {% extends 'base.html' %}
 {% block title %}{{ target_user.get_full_name|default:target_user.username }} — IconJobs{% endblock %}
 {% block content %}
+
+<!--
+    profile.html — public (and private) user profile page.
+    Works for both viewing your own profile and viewing someone else's.
+    The view passes several boolean flags that control what's shown:
+
+      can_see_contact  — True if the viewer is an employer who accepted
+                         this applicant; unlocks the amber contact banner.
+      show_documents   — True for the profile owner or an accepting employer;
+                         shows the verification documents section.
+      can_rate         — True for employers who've worked with this seeker;
+                         shows the star rating form at the bottom.
+
+    Sections (top to bottom):
+      1. Profile header card — avatar/photo, name, role badge, location,
+         star rating summary, jobs-completed count, bio, "Edit Profile"
+         button (own profile only), and the contact info banner if unlocked.
+
+      2. Skills & Availability (seekers) or Company Info (employers) — renders
+         a different card depending on the user's role.
+
+      3. Verification Documents — only shown when show_documents is True.
+         Displays DBS check, NI document, and work permit with verified/
+         pending-review tags on each.
+
+      4. Reviews — lists the last 3 ratings received, then the rating
+         submission form if can_rate is True (or an update form if the
+         viewer has already rated this person before).
+-->
+
 <div class="container py-5" style="max-width:840px">
 
   <!-- Profile header card -->

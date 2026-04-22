@@ -1,6 +1,16 @@
 {% extends 'base.html' %}
 {% block title %}Browse Jobs — IconJobs{% endblock %}
 {% block content %}
+
+<!--
+    job_list.html — the main job browsing page.
+    Shows a search/filter form at the top (keyword, location, duration,
+    category) and then renders a grid of matching job cards below.
+    If no jobs match the filters, an empty-state message is shown with a
+    "Clear All Filters" link to reset. The jobs queryset and the bound
+    form are passed in from the job_list() view in jobs/views.py.
+-->
+
 <div class="page-header">
   <div class="container">
     <p class="section-label mb-2">All Opportunities</p>

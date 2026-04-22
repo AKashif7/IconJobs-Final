@@ -11,14 +11,24 @@ from .models import UserProfile, UserDocument, VerificationQueue, Rating
 from django.views.decorators.http import require_http_methods
 from django.http import JsonResponse
 
+# All view functions for the accounts app. Covers the full user lifecycle:
+# registration, login, logout, profile viewing, profile editing, document
+# uploads for verification, and the admin-only dashboard for reviewing and
+# approving those documents.
+
 
 def register_view(request):
+    # If someone who's already logged in tries to hit /register/, just send
+    # them to the homepage — no point letting them create a second account.
     if request.user.is_authenticated:
         return redirect('home')
+
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save()
+            # Log the user in immediately after registration so they don't
+            # have to go through the login page straight after signing up.
             login(request, user)
             messages.success(request, f'Welcome to IconJobs, {user.first_name}!')
             return redirect('home')
@@ -28,34 +38,37 @@ def register_view(request):
 
 
 def login_view(request):
+    # Again, redirect logged-in users away from the login page.
     if request.user.is_authenticated:
         return redirect('home')
-    
+
     if request.method == 'POST':
         username_or_email = request.POST.get('username', '').strip()
         password = request.POST.get('password', '')
-        
-        # Try to find user by email first, then by username
+
+        # Allow users to sign in with either their username or email address.
+        # Check if there's an @ symbol to decide which lookup to try first.
         user = None
         if '@' in username_or_email:
-            # It's an email
             try:
                 user_obj = User.objects.get(email=username_or_email)
                 user = authenticate(request, username=user_obj.username, password=password)
             except User.DoesNotExist:
                 pass
-        
-        # If not found by email or no @ sign, try username
+
+        # Fall back to a standard username lookup if email didn't match.
         if user is None:
             user = authenticate(request, username=username_or_email, password=password)
-        
+
         if user is not None:
             login(request, user)
             messages.success(request, f'Welcome back, {user.first_name or user.username}!')
+            # Respect the ?next= parameter so users land on the page they
+            # were trying to reach before being redirected to login.
             return redirect(request.GET.get('next', 'home'))
         else:
             messages.error(request, 'Invalid email/username or password.')
-    
+
     return render(request, 'accounts/login.html', {})
 
 
@@ -67,6 +80,9 @@ def logout_view(request):
 
 @login_required
 def profile_view(request, username=None):
+    # When a username is passed in the URL (e.g. /accounts/profile/johndoe/)
+    # we show that person's public profile. Without a username it defaults
+    # to the currently logged-in user's own profile.
     if username:
         target_user = get_object_or_404(User, username=username)
     else:
@@ -74,7 +90,9 @@ def profile_view(request, username=None):
 
     profile = get_object_or_404(UserProfile, user=target_user)
 
-    # Check if viewer can see contact info (employer who accepted this seeker)
+    # An employer can only see a seeker's phone/email if they've accepted
+    # that specific applicant and the contact has been revealed — privacy
+    # by default until acceptance.
     can_see_contact = False
     if request.user != target_user and hasattr(request.user, 'profile'):
         if request.user.profile.role == 'employer':
@@ -85,21 +103,24 @@ def profile_view(request, username=None):
                 contact_revealed=True
             ).exists()
 
-    # Rating
+    # Pull any existing rating this viewer has already given to avoid
+    # showing a blank form when they've already submitted one.
     existing_rating = None
     if request.user != target_user:
         existing_rating = Rating.objects.filter(reviewer=request.user, reviewed=profile).first()
 
+    # Only employers who've accepted or completed work with this seeker
+    # are allowed to leave a rating.
     can_rate = False
     if request.user != target_user and profile.role == 'jobseeker':
-        # Employer who accepted and completed with this person can rate
         can_rate = Application.objects.filter(
             applicant=target_user,
             job__employer=request.user,
             status__in=['accepted', 'completed']
         ).exists()
 
-    # Documents visible to own user, or to an employer who accepted them
+    # Build the document list. The user can always see their own documents;
+    # an employer can see them only after contact has been revealed.
     show_documents = (request.user == target_user) or can_see_contact
     doc_items = []
     if show_documents and profile.role == 'jobseeker':
@@ -131,7 +152,8 @@ def edit_profile(request):
         form = ProfileEditForm(request.POST, request.FILES, instance=profile)
         password_error = None
 
-        # Handle password change if any password field is filled
+        # Handle optional password change — only kicks in if the user has
+        # filled in at least one of the password fields.
         current_pw = request.POST.get('current_password', '').strip()
         new_pw1 = request.POST.get('new_password1', '').strip()
         new_pw2 = request.POST.get('new_password2', '').strip()
@@ -151,6 +173,9 @@ def edit_profile(request):
 
         if form.is_valid() and not password_error:
             profile_obj = form.save(commit=False)
+
+            # Also update the underlying Django User record with the
+            # name and email from the form.
             request.user.first_name = form.cleaned_data['first_name']
             request.user.last_name = form.cleaned_data['last_name']
             request.user.email = form.cleaned_data['email']
@@ -160,9 +185,12 @@ def edit_profile(request):
             if changing_password:
                 request.user.set_password(new_pw1)
                 request.user.save()
+                # update_session_auth_hash keeps the user logged in after a
+                # password change, otherwise Django invalidates their session.
                 update_session_auth_hash(request, request.user)
 
-            # Save verification documents (job seekers only)
+            # Job seekers can also update their identity documents here.
+            # update_or_create means re-uploading a document replaces the old one.
             if profile.role == 'jobseeker':
                 for doc_type in ['dbs_check', 'national_insurance', 'work_permit_visa']:
                     file_obj = request.FILES.get(doc_type)
@@ -185,6 +213,8 @@ def edit_profile(request):
     else:
         form = ProfileEditForm(instance=profile)
 
+    # Pass any already-uploaded documents so the template can show what's
+    # been submitted and let the user replace individual files.
     uploaded_docs = {doc.document_type: doc for doc in UserDocument.objects.filter(user=request.user)}
     return render(request, 'accounts/edit_profile.html', {
         'form': form,
@@ -195,6 +225,9 @@ def edit_profile(request):
 
 @login_required
 def rate_user(request, username):
+    # Handles POST submissions from the rating form on a profile page.
+    # update_or_create means submitting a second rating updates the existing
+    # one rather than throwing a duplicate error.
     target_user = get_object_or_404(User, username=username)
     profile = get_object_or_404(UserProfile, user=target_user)
 
@@ -214,18 +247,16 @@ def rate_user(request, username):
     return redirect('profile_username', username=username)
 
 
-# ============ FEATURE 1 & 2: Document Upload & Verification ============
+# ── Document Upload & Verification ────────────────────────────────────────
 
 @login_required
 @require_http_methods(["GET", "POST"])
 def upload_documents_view(request):
-    """
-    Allow job seekers to upload documents (profile photo, DBS, NIN, work permit)
-    Handles both initial registration and profile updates
-    """
+    # The dedicated page where job seekers submit their identity documents
+    # (DBS check, National Insurance, work permit) to request a blue tick
+    # verification badge. Employers can't access this page.
     profile = get_object_or_404(UserProfile, user=request.user)
-    
-    # Only job seekers can upload documents
+
     if profile.role != 'jobseeker':
         messages.error(request, 'Only job seekers can upload documents.')
         return redirect('edit_profile')
@@ -234,16 +265,15 @@ def upload_documents_view(request):
         form = DocumentUploadForm(request.POST, request.FILES)
         if form.is_valid():
             try:
-                # Get form data
                 legal_name = form.cleaned_data.get('legal_name')
                 phone_for_otp = form.cleaned_data.get('phone_for_otp')
-                
-                # Update profile with legal name and phone
+
+                # Store the legal name and OTP phone on the profile so
+                # admins can cross-check them against the uploaded documents.
                 profile.legal_name = legal_name
                 profile.phone_for_otp = phone_for_otp
                 profile.save()
 
-                # Process each document type
                 document_types = [
                     'profile_photo',
                     'dbs_check',
@@ -255,7 +285,8 @@ def upload_documents_view(request):
                 for doc_type in document_types:
                     file_obj = request.FILES.get(doc_type)
                     if file_obj:
-                        # Create or update document
+                        # update_or_create replaces any previous upload of
+                        # the same document type for this user.
                         doc, created = UserDocument.objects.update_or_create(
                             user=request.user,
                             document_type=doc_type,
@@ -267,7 +298,8 @@ def upload_documents_view(request):
                         )
                         uploaded_count += 1
 
-                # Create or update verification queue entry
+                # Place the user in the admin review queue (or reset their
+                # status to pending if they're resubmitting).
                 verification, created = VerificationQueue.objects.update_or_create(
                     user=request.user,
                     defaults={
@@ -287,7 +319,6 @@ def upload_documents_view(request):
     else:
         form = DocumentUploadForm()
 
-    # Get already uploaded documents
     uploaded_docs = UserDocument.objects.filter(user=request.user)
     verification_status = VerificationQueue.objects.filter(user=request.user).first()
 
@@ -303,14 +334,12 @@ def upload_documents_view(request):
 @login_required
 @require_http_methods(["GET"])
 def get_user_documents_api(request, user_id):
-    """
-    API endpoint to fetch uploaded documents for a user
-    Used by admin dashboard and application forms
-    """
+    # JSON API endpoint used by the admin review pages and application forms
+    # to fetch a user's uploaded documents without a full page reload.
     try:
         user = get_object_or_404(User, id=user_id)
         documents = UserDocument.objects.filter(user=user)
-        
+
         doc_data = {}
         for doc in documents:
             doc_data[doc.document_type] = {
@@ -321,28 +350,25 @@ def get_user_documents_api(request, user_id):
                 'uploaded_at': doc.uploaded_at.isoformat(),
                 'is_verified': doc.is_verified,
             }
-        
+
         return JsonResponse(doc_data, safe=False)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
 
 
-# ============ ADMIN VERIFICATION DASHBOARD ============
+# ── Admin Verification Dashboard ──────────────────────────────────────────
 
 def is_admin(user):
-    """Check if user is admin"""
+    # Simple helper used with @user_passes_test to guard admin-only views.
     return user.is_staff or user.is_superuser
 
 
 @login_required
 @user_passes_test(is_admin)
 def admin_verification_dashboard(request):
-    """
-    Admin dashboard to review and approve/reject user documents
-    Awards blue tick badge upon approval
-    """
-    
-    # Get pending verifications
+    # The main admin screen for reviewing verification submissions. Shows
+    # counts across all three statuses and lets admins switch between the
+    # pending, approved, and rejected tabs.
     pending = VerificationQueue.objects.filter(status='pending').select_related('user')
     approved = VerificationQueue.objects.filter(status='approved').select_related('user')
     rejected = VerificationQueue.objects.filter(status='rejected').select_related('user')
@@ -351,10 +377,11 @@ def admin_verification_dashboard(request):
         'pending_count': pending.count(),
         'approved_count': approved.count(),
         'rejected_count': rejected.count(),
-        'pending': pending[:10],  # Show latest 10
+        'pending': pending[:10],
         'tab': request.GET.get('tab', 'pending')
     }
 
+    # Show the correct list depending on which tab the admin clicked.
     if context['tab'] == 'approved':
         context['verifications'] = approved[:10]
     elif context['tab'] == 'rejected':
@@ -369,10 +396,8 @@ def admin_verification_dashboard(request):
 @user_passes_test(is_admin)
 @require_http_methods(["GET"])
 def admin_review_user(request, user_id):
-    """
-    Detailed review page for a specific user
-    Shows all documents and verification status
-    """
+    # Detailed review page for a single user — shows all their documents
+    # side-by-side so the admin can compare them before deciding.
     user = get_object_or_404(User, id=user_id)
     profile = get_object_or_404(UserProfile, user=user)
     documents = UserDocument.objects.filter(user=user)
@@ -391,20 +416,18 @@ def admin_review_user(request, user_id):
 @user_passes_test(is_admin)
 @require_http_methods(["POST"])
 def admin_approve_user(request, user_id):
-    """
-    AJAX endpoint: Approve user and award blue tick
-    """
+    # AJAX endpoint called when an admin clicks "Approve". Awards the blue
+    # tick by setting both is_verified and blue_tick_awarded on the profile,
+    # then records who reviewed it and when.
     try:
         user = get_object_or_404(User, id=user_id)
         profile = get_object_or_404(UserProfile, user=user)
         verification = VerificationQueue.objects.get(user=user)
 
-        # Award blue tick
         profile.is_verified = True
         profile.blue_tick_awarded = True
         profile.save()
 
-        # Update verification queue
         verification.status = 'approved'
         verification.reviewed_by = request.user
         verification.admin_notes = request.POST.get('admin_notes', '')
@@ -425,13 +448,13 @@ def admin_approve_user(request, user_id):
 @user_passes_test(is_admin)
 @require_http_methods(["POST"])
 def admin_reject_user(request, user_id):
-    """
-    AJAX endpoint: Reject user (requires rejection reason)
-    """
+    # AJAX endpoint for rejecting a verification submission. A rejection
+    # reason is required — it can be shown to the user so they know what
+    # to fix and resubmit.
     try:
         user = get_object_or_404(User, id=user_id)
         verification = VerificationQueue.objects.get(user=user)
-        
+
         rejection_reason = request.POST.get('rejection_reason', '')
         if not rejection_reason:
             return JsonResponse({
@@ -439,7 +462,6 @@ def admin_reject_user(request, user_id):
                 'error': 'Please provide a rejection reason'
             }, status=400)
 
-        # Update verification queue
         verification.status = 'rejected'
         verification.reviewed_by = request.user
         verification.rejection_reason = rejection_reason
@@ -460,10 +482,9 @@ def admin_reject_user(request, user_id):
 @login_required
 @require_http_methods(["GET"])
 def verification_status_api(request):
-    """
-    AJAX: Get current user's verification status
-    Used to show badge status on profile
-    """
+    # Lightweight JSON endpoint the frontend can poll to check whether the
+    # currently logged-in user has been verified or rejected, so the profile
+    # page badge updates without a full reload.
     profile = get_object_or_404(UserProfile, user=request.user)
     verification = VerificationQueue.objects.filter(user=request.user).first()
 

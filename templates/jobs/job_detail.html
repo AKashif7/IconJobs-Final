@@ -1,6 +1,28 @@
 {% extends 'base.html' %}
 {% block title %}{{ job.title }} — IconJobs{% endblock %}
 {% block content %}
+
+<!--
+    job_detail.html — the individual job listing page.
+    Layout: two-column (col-lg-8 + col-lg-4 sidebar).
+
+    Left column:
+      - Job title, posted-by line, trending badge.
+      - A stats bar showing location, duration, pay, start date, and spots.
+      - Full job description (white-space: pre-wrap so line breaks are kept).
+
+    Right sidebar:
+      - Apply/status card — adapts based on: job status (open/closed),
+        whether the visitor is logged in, their role (seeker vs employer),
+        and whether they've already applied. Employers who own the job see
+        "View Applicants / Edit / Close" controls instead.
+      - Save button (seekers only) — calls the save_job JSON endpoint and
+        toggles the bookmark icon without reloading the page.
+      - Employer info card showing company name, location, and a short bio.
+
+    The extra_js block at the bottom handles the save toggle via fetch().
+-->
+
 <div class="container py-5">
 
   <nav aria-label="breadcrumb" style="margin-bottom:1.75rem">

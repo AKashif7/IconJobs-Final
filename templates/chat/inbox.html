@@ -1,6 +1,39 @@
 {% extends 'base.html' %}
 {% block title %}Messages — IconJobs{% endblock %}
 
+<!--
+    inbox.html — the main messaging interface.
+    Layout is a full-viewport split panel (chat-layout CSS class in base.html):
+      Left sidebar  — scrollable list of all conversations, each showing the
+                      other person's avatar, name, last message preview, date,
+                      and an unread count pill. The active conversation is
+                      highlighted in amber.
+      Right panel   — the open conversation, or a placeholder prompt if none
+                      is selected.
+
+    The extra_css block hides the footer and locks body overflow so the chat
+    fills exactly the viewport height without a scrollbar on the outer page.
+
+    When a conversation is open (active_conv is set), the right panel shows:
+      - Header: other user's avatar, name, company, star rating, jobs completed,
+        and a live online/offline indicator updated by pollOnline() every 15s.
+      - Contact banner: shown only when the application is accepted and
+        contact_revealed is True — displays email and optionally phone.
+      - Message bubbles: own messages on the right (dark), theirs on the left
+        (white). The last message I sent that has been read shows a "Seen" tick.
+      - Quick-reply buttons: contextual shortcuts that pre-fill the input box.
+        Employers get address/dress code prompts; seekers get "Thank you"/
+        "What time?" prompts.
+      - Input form: plain text field + send button. Submits via POST with a
+        PRG redirect to prevent duplicate messages on page refresh.
+
+    The extra_js block handles:
+      - Auto-scrolling the message area to the bottom on load.
+      - insertQuick() — fills the input box with a quick-reply string.
+      - pollOnline() — fetches /chat/api/online/?uid=X every 15 seconds and
+        updates the online dot and header status text for all visible users.
+-->
+
 {% block extra_css %}
 <style>
     body > .footer { display: none; }

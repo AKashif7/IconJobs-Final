@@ -1,8 +1,16 @@
 from django import forms
 from .models import Job, Application, JobCategory
 
+# Forms for the jobs app. Three forms cover everything: posting a job
+# (employer), applying for a job (seeker), and filtering the job list
+# (anyone browsing). All widgets are styled with Bootstrap classes so they
+# match the rest of the site without extra CSS.
+
 
 class JobPostForm(forms.ModelForm):
+    # Used by employers on the Post a Job page and the Edit Job page.
+    # The employer field isn't included here — it's set in the view from
+    # request.user so an employer can't accidentally post as someone else.
     class Meta:
         model = Job
         fields = [
@@ -36,6 +44,7 @@ class JobPostForm(forms.ModelForm):
                 'min': '1',
                 'placeholder': '1'
             }),
+            # date type makes the browser show a native date picker.
             'start_date': forms.DateInput(attrs={
                 'class': 'form-control',
                 'type': 'date'
@@ -44,6 +53,8 @@ class JobPostForm(forms.ModelForm):
 
 
 class ApplicationForm(forms.ModelForm):
+    # Only the cover message is collected from the applicant here. The job
+    # and applicant are set in the view from the URL parameter and request.user.
     class Meta:
         model = Application
         fields = ['cover_message']
@@ -57,6 +68,9 @@ class ApplicationForm(forms.ModelForm):
 
 
 class JobSearchForm(forms.Form):
+    # Powers the filter bar on the job listings page. All fields are optional
+    # so users can search by keyword, location, duration, or category
+    # individually or in any combination.
     q = forms.CharField(
         required=False,
         widget=forms.TextInput(attrs={
@@ -85,6 +99,9 @@ class JobSearchForm(forms.Form):
         ],
         widget=forms.Select(attrs={'class': 'form-select'})
     )
+
+    # ModelChoiceField automatically populates from the database so new
+    # categories appear in the dropdown as soon as they're added in admin.
     category = forms.ModelChoiceField(
         queryset=JobCategory.objects.all(),
         required=False,

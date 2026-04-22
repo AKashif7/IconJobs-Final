@@ -2,6 +2,18 @@
 {% block title %}IconJobs — Local Micro Jobs in London{% endblock %}
 {% block content %}
 
+<!--
+    home.html — the landing page of IconJobs.
+    Sections (top to bottom):
+      1. Hero banner with headline, sub-copy, and the quick search bar.
+      2. Category pill strip for browsing by job type.
+      3. Trending jobs grid — up to 6 jobs sorted by applications and views.
+      4. Recent jobs grid — up to 6 of the newest listings.
+      5. CTA banner for unauthenticated visitors prompting them to register.
+    All data (trending_jobs, recent_jobs, categories, total_jobs) is passed
+    in from the home() view in jobs/views.py.
+-->
+
 <section class="hero">
   <div class="container">
     <div class="row align-items-center g-5">

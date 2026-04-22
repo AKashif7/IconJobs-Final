@@ -1,3 +1,12 @@
+<!--
+    base.html — the master layout template for the entire IconJobs platform.
+    Every other page template extends this one using {% extends 'base.html' %}.
+    It defines the global CSS variables (colours, fonts, spacing), the sticky
+    navbar, the mobile sidebar, the flash messages container, the footer, and
+    the shared JavaScript for unread badge polling and the hamburger menu.
+    Child templates slot their content in via {% block content %} and can add
+    extra CSS/JS through {% block extra_css %} and {% block extra_js %}.
+-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,9 +14,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}IconJobs{% endblock %}</title>
     {% load static %}
+    <!-- Bootstrap 5 for grid, components, and utility classes. -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons — used for all the small icons throughout the UI. -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <style>
+        /* CSS custom properties for the IconJobs design system.
+           All colours, radii, shadows and fonts are defined here so they
+           can be changed in one place and cascade everywhere. */
         :root {
             --ink: #0d0d0d;
             --paper: #f5f2eb;

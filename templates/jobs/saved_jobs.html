@@ -1,6 +1,19 @@
 {% extends 'base.html' %}
 {% block title %}Saved Jobs — IconJobs{% endblock %}
 {% block content %}
+
+<!--
+    saved_jobs.html — the job seeker's bookmarks page.
+    Renders all SavedJob records for the current user as a grid of job cards,
+    each showing the job title, employer/company name, location, duration,
+    pay rate, and how long ago it was saved.
+
+    If the seeker hasn't saved anything yet, an empty-state prompt with a
+    "Browse Jobs" button is shown instead. The 'saves' queryset is passed
+    in from the saved_jobs() view in jobs/views.py with the related job
+    pre-fetched so there are no extra queries per card.
+-->
+
 <div class="page-header">
   <div class="container">
     <p class="section-label mb-2">Your Bookmarks</p>

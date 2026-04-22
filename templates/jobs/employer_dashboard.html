@@ -1,6 +1,22 @@
 {% extends 'base.html' %}
 {% block title %}Employer Dashboard — IconJobs{% endblock %}
 {% block content %}
+
+<!--
+    employer_dashboard.html — the employer's control panel.
+    Lists every job this employer has posted, newest first, each as a
+    card showing:
+      - Job title, status badge (open/closed/filled), location, duration, pay.
+      - Live applicant count and view count pulled directly from the model.
+      - Action buttons: View Applicants, Edit, and Close (only shown if open).
+
+    The "Post New Job" button in the page header links to post_job.html.
+    If the employer has no jobs yet, an empty-state prompt encourages them
+    to post their first listing.
+
+    Data comes from the employer_dashboard() view in jobs/views.py.
+-->
+
 <div class="page-header">
   <div class="container d-flex justify-content-between align-items-center">
     <div>

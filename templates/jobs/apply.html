@@ -1,6 +1,27 @@
 {% extends 'base.html' %}
 {% block title %}Apply — {{ job.title }} — IconJobs{% endblock %}
 {% block content %}
+
+<!--
+    apply.html — the job application form page.
+    Shown to job seekers after they click "Apply Now" on a job detail page.
+
+    Sections:
+      - A compact job summary banner (title, location, duration, pay) so
+        the seeker can confirm they're applying to the right role.
+      - Cover message textarea — optional but recommended.
+      - Supporting documents section — dynamic file inputs. The seeker can
+        upload as many files as they need (CV, certificates, portfolio, etc.)
+        using the "Add another file" button, which clones a new file input
+        via addFileInput() in the extra_js block.
+      - An info box reminding the seeker what the employer will and won't see
+        (contact details stay hidden until acceptance).
+
+    The extra_js block provides addFileInput() and removeFile() — small
+    helper functions that manage the dynamic list of file upload rows without
+    needing a full JS framework.
+-->
+
 <div class="container py-5" style="max-width:700px">
 
   <a href="/jobs/{{ job.pk }}/" style="font-size:0.85rem;color:var(--amber-dark);font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:4px;margin-bottom:1.5rem">

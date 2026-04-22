@@ -1,6 +1,27 @@
 {% extends 'base.html' %}
 {% block title %}Create Account — IconJobs{% endblock %}
 {% block content %}
+
+<!--
+    register.html — the new account registration page.
+    The form is divided into four clearly labelled sections separated by
+    horizontal dividers, matching the four stages of the RegisterForm:
+
+      1. Personal Information  — first name, last name, email, username.
+      2. Account Type          — role selector (Job Seeker or Employer).
+      3. Set a Password        — password + confirmation with hint text.
+      4. Terms & Conditions    — two mandatory checkboxes the user must
+                                 actively tick before they can submit.
+
+    The extra_js block contains validateTerms(), a small client-side check
+    that fires on the submit button click and alerts the user if either
+    checkbox is unticked — a belt-and-braces check on top of Django's
+    server-side validation.
+
+    Any form-level errors (e.g. username taken, passwords don't match) are
+    shown inline directly below the relevant field via {% if form.field.errors %}.
+-->
+
 <div class="container py-5" style="max-width:560px">
 
   <div class="text-center mb-5">

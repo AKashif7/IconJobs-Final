@@ -1,6 +1,31 @@
 {% extends 'base.html' %}
 {% block title %}Applicants — {{ job.title }} — IconJobs{% endblock %}
 {% block content %}
+
+<!--
+    applicants.html — the employer's view of all applicants for a single job.
+    The page header shows the job title, location, duration, pay and total
+    applicant count at a glance.
+
+    Filter buttons at the top (All / Pending / Shortlisted / Accepted /
+    Rejected / Completed) are powered by the filter JS in extra_js — they
+    show/hide applicant cards client-side without hitting the server again.
+
+    Each applicant card (three columns) shows:
+      Left  — Avatar initials, full name linked to profile, time since applied,
+               star rating with review count, jobs-completed count, skills, location.
+      Middle — Cover message (if provided), uploaded documents as clickable links,
+               and revealed contact details (email/phone) once accepted.
+      Right  — Current status badge plus contextual action buttons:
+               Pending/Shortlisted → Accept / Shortlist / Reject
+               Accepted           → Mark Complete / Full Profile / Open Chat / Cancel
+               Completed          → Leave Rating link
+               Rejected/Cancelled → read-only status display
+
+    The extra_js block wires up the filter buttons to show/hide cards by
+    their data-status attribute.
+-->
+
 <div class="page-header">
   <div class="container">
     <a href="/employer/dashboard/" style="color:rgba(255,255,255,0.5);font-size:0.82rem;text-decoration:none;display:inline-flex;align-items:center;gap:4px;margin-bottom:0.75rem">

@@ -1,6 +1,35 @@
 {% extends 'base.html' %}
 {% block title %}Edit Profile — IconJobs{% endblock %}
 {% block content %}
+
+<!--
+    edit_profile.html — the profile editing form.
+    Uses enctype="multipart/form-data" because users can upload files
+    (profile picture, CV, and verification documents) alongside text fields.
+
+    The form is split into labelled sections with horizontal dividers:
+
+      1. Personal Information  — first name, last name, email, bio.
+      2. Location & Contact    — location and phone number.
+      3. Profile Picture       — image upload field.
+      4. Role-specific section — rendered via {% if profile.role %}:
+           Job Seeker: Skills, Availability, CV upload.
+           Employer:   Company Name, Company Description, Website.
+      5. Verification Documents (seekers only) — three document upload rows
+         (DBS check, National Insurance, Work Permit/Visa). Each row shows
+         the currently uploaded file name and its verified/pending-review
+         status if a file already exists.
+      6. Change Password       — current password + new password x2.
+         All three fields must be filled to trigger a password change;
+         leaving them blank skips the password update entirely.
+      7. Privacy Settings      — two checkboxes controlling whether accepted
+         employers can see the user's phone number and/or email address.
+
+    All validation (password check, file size, etc.) is handled in
+    edit_profile() in accounts/views.py and any errors are surfaced as
+    Django flash messages above the form.
+-->
+
 <div class="container py-5" style="max-width:680px">
 
   <a href="/accounts/profile/" style="font-size:0.85rem;color:var(--amber-dark);font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:4px;margin-bottom:1.5rem">

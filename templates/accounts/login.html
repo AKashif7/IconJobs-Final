@@ -1,6 +1,19 @@
 {% extends 'base.html' %}
 {% block title %}Sign In — IconJobs{% endblock %}
 {% block content %}
+
+<!--
+    login.html — the sign-in page.
+    A deliberately minimal form: just an "Email or Username" field and a
+    password field. The username field accepts both formats because the
+    login_view() in accounts/views.py checks for an @ symbol and tries
+    an email lookup first before falling back to a standard username auth.
+
+    The autofocus attribute on the username input means the field is ready
+    to type in immediately without the user having to click it.
+    A link to the register page sits below the card for new visitors.
+-->
+
 <div class="container py-5" style="max-width:480px">
 
   <div class="text-center mb-5">
