@@ -51,6 +51,11 @@ class JobPostForm(forms.ModelForm):
             }),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['category'].empty_label = 'Select a category'
+        self.fields['category'].queryset = JobCategory.objects.all().order_by('name')
+
 
 class ApplicationForm(forms.ModelForm):
     # Only the cover message is collected from the applicant here. The job
